@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const uploadMiddleware = require("../helper/uploadMiddleware");
 const productImageModel = require("../models/productImageModel");
-
+ 
 
 
 
