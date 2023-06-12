@@ -2,6 +2,7 @@ const {db} = require('../../database/connection');
 
 const ProductModel = require("../models/productModel");
 const quantityModel = require("../models/quantityModel");
+const categoryModel = require("../models/categoryModel");
 const path = require('path');
 const fs = require('fs');
 const uploadMiddleware = require("../helper/uploadMiddleware");
@@ -154,50 +155,72 @@ async function handalSaveProduct(req, res){
 }
 
 async function handalAllProduct(req, res){
-
+    const productArray = [];
     //SubCategoryModel.findAll({ include: [ CategoryModel ], order: [ [ CategoryModel, 'category_name' ] ] });
-    ProductModel.findAll({
+    await ProductModel.findAll({
         include: [
           {
             model: quantityModel,
             as: 'Quantity'
-          },
+          },{
+            model: categoryModel,
+            as: 'Category'
+          }
         ],
       })
-        .then((users) => {
+        .then((products) => {
           // Access the data from the three tables
+          //console.log(products)
+            products.forEach((product) => {
+               //console.log('User:', products);
+               const inner_hash = {
+                    id: product.id, 
+                    category_id: "", 
+                    sub_category_id: product.sub_category_id, 
+                    no_of_product: 0,
+                    size: "",
+                    active_status: product.active_status,
+                    quantity_xs: 0,
+                    quantity_s: 0,
+                    quantity_l: 0,
+                    quantity_m: 0,
+                    quantity_xl: 0,
+                    quantity_2xl: 0,
+                }
+                const quantityArray = [];
+                product.Quantity.forEach((quantity) => {
+                    //console.log('---------------------------');
+                    //console.log('Post:', quantityS.toJSON());
+                    quantityArray.push(quantity.no_of_product);
+                    if(quantity.size == "XS"){
+                        inner_hash['quantity_xs'] = quantity.no_of_product;
+                    }else if(quantity.size == "S"){
+                        inner_hash['quantity_s'] = quantity.no_of_product;
+                    }else if(quantity.size == "L"){
+                        inner_hash['quantity_l'] = quantity.no_of_product;
+                    }else if(quantity.size == "M"){
+                        inner_hash['quantity_m'] = quantity.no_of_product;
+                    }else if(quantity.size == "XL"){
+                        inner_hash['quantity_xl'] = quantity.no_of_product;
+                    }else if(quantity.size == "2XL"){
+                        inner_hash['quantity_2xl'] = quantity.no_of_product;
+                    }
+                });
 
-            //console.log(users)
-
-
-          users.forEach((user) => {
-            console.log('User:', user.toJSON());
-            /*user.Posts.forEach((post) => {
-              console.log('Post:', post.toJSON());
-              post.Comments.forEach((comment) => {
-                console.log('Comment:', comment.toJSON());
-              });
-            });*/
-          });
+                inner_hash['category_id'] = product.Category.category_name;
+                inner_hash['no_of_product'] = quantityArray.reduce((sum, current) => sum + current, 0);
+                productArray.push(inner_hash);
+            });
+            
         })
         .catch((error) => {
           console.error('Error:', error);
         });
       
 
-
-
-
-
-
-
-
-
-
-
-    const category = await ProductModel.findAll();
-    //console.log("All users:", JSON.stringify(JSON.stringify, null, 2));
-    return res.status(200).send(category);
+       // console.log("=======================");
+       //console.log(productArray);
+    return res.status(200).send(productArray);
 }
 
 async function handalFindProductById(req, res){

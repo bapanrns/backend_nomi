@@ -22,11 +22,13 @@ app.use(function (req, res, next) {
 
 //const Address = require("./app/models/addressModel");
 //Address.sync({ force: true })
-//const Category = require("./app/models/categoryModel");
+const Category = require("./app/models/categoryModel");
 //Category.sync({ force: true })
 
-//const SubCategory = require("./app/models/subCategoryModel");
+const SubCategory = require("./app/models/subCategoryModel");
 //SubCategory.sync({ force: true })
+
+
 
 //const productFabric = require("./app/models/productFabricModel");
 //productFabric.sync({ force: true })
@@ -36,6 +38,18 @@ const Product = require("./app/models/productModel");
 
 const Quantity = require("./app/models/quantityModel");
 //Quantity.sync({ force: true })
+
+/* Relationship of Sub Category  and Product table */
+Category.hasMany(Product,{
+    foreignKey: 'category_id',
+    as: 'Product'
+});
+Product.belongsTo(Category,{
+    foreignKey: 'category_id',
+    as: 'Category'
+});
+
+/* Relationship of Product and Quantity table */
 
 Product.hasMany(Quantity,{
     foreignKey: 'product_id',
