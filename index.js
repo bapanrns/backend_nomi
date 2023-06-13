@@ -49,6 +49,16 @@ Product.belongsTo(Category,{
     as: 'Category'
 });
 
+/* Relationship of Sub Category  and Product table */
+SubCategory.hasMany(Product,{
+    foreignKey: 'sub_category_id',
+    as: 'Product'
+});
+Product.belongsTo(SubCategory,{
+    foreignKey: 'sub_category_id',
+    as: 'SubCategory'
+});
+
 /* Relationship of Product and Quantity table */
 
 Product.hasMany(Quantity,{

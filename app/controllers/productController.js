@@ -3,6 +3,7 @@ const {db} = require('../../database/connection');
 const ProductModel = require("../models/productModel");
 const quantityModel = require("../models/quantityModel");
 const categoryModel = require("../models/categoryModel");
+const subCategoryModel = require("../models/subCategoryModel");
 const path = require('path');
 const fs = require('fs');
 const uploadMiddleware = require("../helper/uploadMiddleware");
@@ -165,6 +166,9 @@ async function handalAllProduct(req, res){
           },{
             model: categoryModel,
             as: 'Category'
+          },{
+            model: subCategoryModel,
+            as: 'SubCategory'
           }
         ],
       })
@@ -176,6 +180,7 @@ async function handalAllProduct(req, res){
                const inner_hash = {
                     id: product.id, 
                     category_id: "", 
+                    color: product.color,
                     sub_category_id: product.sub_category_id, 
                     no_of_product: 0,
                     size: "",
@@ -208,6 +213,7 @@ async function handalAllProduct(req, res){
                 });
 
                 inner_hash['category_id'] = product.Category.category_name;
+                inner_hash['sub_category_id'] = product.SubCategory.sub_category_name;
                 inner_hash['no_of_product'] = quantityArray.reduce((sum, current) => sum + current, 0);
                 productArray.push(inner_hash);
             });
