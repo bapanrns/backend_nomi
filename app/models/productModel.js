@@ -64,8 +64,24 @@ Product.init({
         type: DataTypes.STRING,
         allowNull: true
     },
-    images:{
-        type: DataTypes.STRING,
+    group_id:{
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    saree_length:{
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    blouse:{
+        type: DataTypes.STRING(50),
+        allowNull: true
+    },
+    blouse_length:{
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    weight:{
+        type: DataTypes.FLOAT,
         allowNull: true
     }
 }, {

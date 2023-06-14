@@ -11,7 +11,7 @@ const {handalSaveSubCategory, handalAllSubCategory, handalFindSubCategoryById, h
 // Product Fabric Controller
 const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById} = require('../controllers/productFabricController')
 // Product Controller
-const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById} = require('../controllers/productController')
+const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId} = require('../controllers/productController')
 
 const app = express();
 
@@ -59,5 +59,6 @@ router.route("/productAdd").post(handalSaveProduct);
 router.route("/AllProduct").post(handalAllProduct);
 router.route("/ProductFindId").post(handalFindProductById);
 router.route("/deleteProduct").post(handalDeleteProductById);
+router.route("/UpdateGroupID").post(handalUpdateGroupId)
 
 module.exports = router;

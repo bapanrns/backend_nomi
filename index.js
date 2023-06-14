@@ -34,7 +34,7 @@ const SubCategory = require("./app/models/subCategoryModel");
 //productFabric.sync({ force: true })
 
 const Product = require("./app/models/productModel");
-//Product.sync({ force: true })
+//Product.sync({ alter: true })
 
 const Quantity = require("./app/models/quantityModel");
 //Quantity.sync({ force: true })
@@ -75,6 +75,9 @@ const productImageModel = require("./app/models/productImageModel");
 
 // - This checks what is the current state of the table in the database (which columns it has, what are their data types, etc), and then performs the necessary changes in the table to make it match the model.
 //User.sync({ alter: true })
+
+const GroupModal = require("./app/models/groupModal");
+//GroupModal.sync({ force: true })
 
 
 // Set up the middleware to parse incoming requests

@@ -1,4 +1,5 @@
 const {db} = require('../../database/connection');
+const { Op } = require('sequelize');
 
 const ProductModel = require("../models/productModel");
 const quantityModel = require("../models/quantityModel");
@@ -8,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const uploadMiddleware = require("../helper/uploadMiddleware");
 const productImageModel = require("../models/productImageModel");
+const groupModal = require("../models/groupModal");
  
 
 
@@ -32,7 +34,11 @@ async function handalSaveProduct(req, res){
                     delivery_charges: req.body.delivery_charges,
                     product_febric_id: req.body.product_febric_id, 
                     product_febric: req.body.product_febric, 
-                    color: req.body.color.join(', ')
+                    color: req.body.color.join(', '),
+                    saree_length: req.body.saree_length,
+                    blouse: req.body.blouse,
+                    blouse_length: req.body.blouse_length,
+                    weight: req.body.weight
                 }
     if(req.body.id > 0){
         // Edit
@@ -156,9 +162,23 @@ async function handalSaveProduct(req, res){
 }
 
 async function handalAllProduct(req, res){
+    let whereCluse = {}
+    if(req.body.category_id !=""){
+        whereCluse['category_id'] = req.body.category_id;
+    }
+
+    if(req.body.sub_category_id !=""){
+        whereCluse['sub_category_id'] = req.body.sub_category_id;
+    }
+    
+    if(req.body.active_status !=""){
+        whereCluse['active_status'] = req.body.active_status;
+    }
+    console.log(whereCluse);
     const productArray = [];
     //SubCategoryModel.findAll({ include: [ CategoryModel ], order: [ [ CategoryModel, 'category_name' ] ] });
     await ProductModel.findAll({
+        where: whereCluse,
         include: [
           {
             model: quantityModel,
@@ -170,7 +190,7 @@ async function handalAllProduct(req, res){
             model: subCategoryModel,
             as: 'SubCategory'
           }
-        ],
+        ]
       })
         .then((products) => {
           // Access the data from the three tables
@@ -180,6 +200,7 @@ async function handalAllProduct(req, res){
                const inner_hash = {
                     id: product.id, 
                     category_id: "", 
+                    group_id: product.group_id,
                     color: product.color,
                     sub_category_id: product.sub_category_id, 
                     no_of_product: 0,
@@ -245,7 +266,47 @@ async function handalDeleteProductById(req, res){
     });
     return res.status(200).send("Deleted Successfully");
 }
+
+async function handalUpdateGroupId(req, res){
+    const product_ids = req.body.product_id;
+    let errorMessage = "Please select the same subcategory";
+    const uniqeSubCategoryIdsLength = await findProductSubCategory(product_ids);
+    if(uniqeSubCategoryIdsLength === 1){
+        const groupObj = await groupModal.create({Product_id: product_ids.join(", ")});
+        const group_id = groupObj.dataValues.id;
+        if(group_id > 0){
+            await ProductModel.update({ group_id: group_id }, {
+                where: {
+                    id:{
+                    [Op.in]: product_ids,
+                    }
+                }
+            });
+        }
+        errorMessage = "Update Successfully";
+    }
+    return res.status(200).send(errorMessage);
+}
+
+async function findProductSubCategory(product_ids){
+    try{
+        const product = await ProductModel.findAll({
+            where: {
+              id: {
+                [Op.in]: product_ids, // Example condition: age greater than or equal to 18
+              }
+            },
+            attributes: ['sub_category_id'], 
+        })
+
+        const sub_category_idsArray = product.map(user => user.sub_category_id);
+        const uniqeSubCategoryIds = [...new Set(sub_category_idsArray)];
+        return uniqeSubCategoryIds.length;
+    } catch (error) {
+        return "Error"
+    }
+}
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId
 }
