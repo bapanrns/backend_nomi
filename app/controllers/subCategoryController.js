@@ -27,13 +27,33 @@ async function handalSaveSubCategory(req, res){
 }
 
 async function handalAllSubCategory(req, res){
-
-    //SubCategoryModel.findAll({ include: [ CategoryModel ], order: [ [ CategoryModel, 'category_name' ] ] });
-
-
-    const subCategory = await SubCategoryModel.findAll();
-    //console.log("All users:", JSON.stringify(JSON.stringify, null, 2));
-    return res.status(200).send(subCategory);
+    let whereCluse = {}
+    if(req.body.category_id !="" && req.body.category_id != undefined){
+        whereCluse['category_id'] = req.body.category_id;
+    }
+    
+    const subCategoryArray = [];
+    const subCategory = await SubCategoryModel.findAll({
+            where: whereCluse,
+            include: [
+                {
+                    model: CategoryModel,
+                    as: 'Category'
+                }
+            ]
+        }).then((category) => {
+            category.forEach((obj) => {
+                const inner_hash = {
+                    id: obj['id'],
+                    category_name: obj['Category']['category_name'],
+                    sub_category_name: obj['sub_category_name'],
+                    active_status: obj['active_status'],
+                }
+                subCategoryArray.push(inner_hash);
+            })
+        });
+        
+    return res.status(200).send(subCategoryArray);
 }
 
 async function handalFindSubCategoryById(req, res){

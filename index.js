@@ -28,7 +28,14 @@ const Category = require("./app/models/categoryModel");
 const SubCategory = require("./app/models/subCategoryModel");
 //SubCategory.sync({ force: true })
 
-
+Category.hasMany(SubCategory,{
+    foreignKey: 'category_id',
+    as: 'SubCategory'
+});
+SubCategory.belongsTo(Category,{
+    foreignKey: 'category_id',
+    as: 'Category'
+});
 
 //const productFabric = require("./app/models/productFabricModel");
 //productFabric.sync({ force: true })
