@@ -38,7 +38,8 @@ async function handalSaveProduct(req, res){
                     saree_length: req.body.saree_length,
                     blouse: req.body.blouse,
                     blouse_length: req.body.blouse_length,
-                    weight: req.body.weight
+                    weight: req.body.weight,
+                    youtube_link: req.body.youtube_link
                 }
     if(req.body.id > 0){
         // Edit
@@ -55,8 +56,8 @@ async function handalSaveProduct(req, res){
         if(product.dataValues.id > 0){
             
             const imageArray = [];
-            if(req.body.images !== null){
-                imageArray.push(req.body.images);
+            if(req.body.images1 !== null){
+                imageArray.push(req.body.images1);
             }
             if(req.body.images2 !== null){
                 imageArray.push(req.body.images2);
@@ -252,9 +253,126 @@ async function handalAllProduct(req, res){
 
 async function handalFindProductById(req, res){
     const id = req.body.id;
-    const category = await ProductModel.findByPk(id);
-    //console.log("All users:", JSON.stringify(JSON.stringify, null, 2));
-    return res.status(200).send(category);
+    const productHash = {
+        id: id,
+        category_id: "",
+        sub_category_id: "",
+        product_name: "",
+        active_status: "",
+        company_name: "",
+        year_month: "",
+        product_original_price: "",
+        product_selling_price: "",
+        product_offer_percentage: "",
+        delivery_charges: "",
+        quantity: "",
+        quantityXs: "",
+        quantityS: "",
+        quantityL: "",
+        quantityM: "",
+        quantityXl: "",
+        quantity2Xl: "",
+        product_febric_id: "",
+        product_febric: "",
+        color: [],
+        product_offer_price: "",
+        images1: null,
+        images2: null,
+        images3: null,
+        images4: null,
+        images5: null,
+        saree_length: 5.5,
+        blouse: "No",
+        blouse_length: ".8",
+        weight:"",
+        youtube_link: ""
+    }
+    if(id !=""){
+        let whereCluse = {}
+        whereCluse['id'] = id;
+
+        const productArray = [];
+        //SubCategoryModel.findAll({ include: [ CategoryModel ], order: [ [ CategoryModel, 'category_name' ] ] });
+        await ProductModel.findAll({
+            where: whereCluse,
+            include: [
+            {
+                model: quantityModel,
+                as: 'Quantity'
+            },{
+                model: categoryModel,
+                as: 'Category'
+            },{
+                model: subCategoryModel,
+                as: 'SubCategory'
+            },{
+                model: productImageModel,
+                as: 'Product_Image'
+            }
+            ]
+        })
+        .then((products) => {
+        // Access the data from the three tables
+            //console.log(products)
+            products.forEach((product) => {
+           // console.log('User:', products);
+                productHash['category_id'] = product.category_id;
+                productHash['sub_category_id'] = product.sub_category_id;
+                productHash['product_name'] = product.product_name;
+                productHash['active_status'] = product.active_status;
+                productHash['company_name'] = product.company_name;
+                productHash['year_month'] = product.year_month;
+                productHash['product_original_price'] = product.product_original_price;
+                productHash['product_selling_price'] = product.product_selling_price;
+                productHash['product_offer_percentage'] = product.product_offer_percentage;
+                productHash['product_offer_price'] = product.product_offer_price;
+                productHash['product_febric'] = product.product_febric;
+                productHash['product_febric_id'] = product.product_febric_id;
+                productHash['color'] = product.color;
+                productHash['saree_length'] = product.saree_length;
+                productHash['blouse'] = product.blouse;
+                productHash['blouse_length'] = product.blouse_length;
+                productHash['weight'] = product.weight;
+                productHash['youtube_link'] = product.youtube_link;
+
+                const quantityArray = [];
+                product.Quantity.forEach((quantity) => {
+                    //console.log('---------------------------');
+                    //console.log('Post:', quantityS.toJSON());
+                    quantityArray.push(quantity.no_of_product);
+                    if(quantity.size == "XS"){
+                        productHash['quantityXs'] = quantity.no_of_product;
+                    }else if(quantity.size == "S"){
+                        productHash['quantityS'] = quantity.no_of_product;
+                    }else if(quantity.size == "L"){
+                        productHash['quantityL'] = quantity.no_of_product;
+                    }else if(quantity.size == "M"){
+                        productHash['quantityM'] = quantity.no_of_product;
+                    }else if(quantity.size == "XL"){
+                        productHash['quantityXl'] = quantity.no_of_product;
+                    }else if(quantity.size == "2XL"){
+                        productHash['quantity2Xl'] = quantity.no_of_product;
+                    }else{
+                        productHash['quantity'] = quantity.no_of_product;
+                    }
+                });
+                
+                product.Product_Image.forEach((productImage, key) => {
+                    productHash['images'+(key+1)] = productImage.image_name;
+                })
+            });
+            
+        })
+        .catch((error) => {
+         console.error('Error:', error);
+        });
+    }
+
+
+
+
+    
+    return res.status(200).send(productHash);
 }
 
 async function handalDeleteProductById(req, res){

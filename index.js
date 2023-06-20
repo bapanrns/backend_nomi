@@ -80,6 +80,17 @@ Quantity.belongsTo(Product,{
 const productImageModel = require("./app/models/productImageModel");
 //productImageModel.sync({ force: true })
 
+/* Relationship of Product and Product Image table */
+
+Product.hasMany(productImageModel,{
+    foreignKey: 'product_id',
+    as: 'Product_Image'
+});
+productImageModel.belongsTo(Product,{
+    foreignKey: 'product_id',
+    as: 'Product'
+});
+
 // - This checks what is the current state of the table in the database (which columns it has, what are their data types, etc), and then performs the necessary changes in the table to make it match the model.
 //User.sync({ alter: true })
 

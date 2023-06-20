@@ -57,7 +57,7 @@ router.route("/deleteProductFabric").post(handalDeleteProductFabricById);
 // ------------------- Product -----------------
 router.route("/productAdd").post(handalSaveProduct);
 router.route("/AllProduct").post(handalAllProduct);
-router.route("/ProductFindId").post(handalFindProductById);
+router.route("/ProductFindById").post(handalFindProductById);
 router.route("/deleteProduct").post(handalDeleteProductById);
 router.route("/UpdateGroupID").post(handalUpdateGroupId)
 

@@ -83,6 +83,10 @@ Product.init({
     weight:{
         type: DataTypes.FLOAT,
         allowNull: true
+    },
+    youtube_link:{
+        type: DataTypes.TEXT,
+        allowNull: true
     }
 }, {
   // Other model options go here
