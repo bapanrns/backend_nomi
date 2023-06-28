@@ -75,7 +75,7 @@ async function handalSaveProduct(req, res){
             for (let i = 0; i < imageArray.length; i++) {
                 base64Image = imageArray[i];
                 const decodedImage = uploadMiddleware.decodeBase64Image(base64Image);
-                const imagePath = path.resolve('/Bapan/img/'+decodedImage.name);
+                const imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/product/'+decodedImage.name);
                 // Save product Images
                 const productImage = await productImageModel.create({
                         product_id: product.dataValues.id,
@@ -334,6 +334,7 @@ async function handalFindProductById(req, res){
                 productHash['blouse_length'] = product.blouse_length;
                 productHash['weight'] = product.weight;
                 productHash['youtube_link'] = product.youtube_link;
+                productHash['delivery_charges'] = product.delivery_charges;
 
                 const quantityArray = [];
                 product.Quantity.forEach((quantity) => {
@@ -424,7 +425,40 @@ async function findProductSubCategory(product_ids){
         return "Error"
     }
 }
+
+async function handalDeleteProductImage(req, res){
+    let errorMessage = "";
+    try {
+        const deletedUser = await productImageModel.destroy({
+            where: {
+                image_name: req.body.image,
+            },
+        });
+    
+        if (deletedUser === 1) {
+            console.log('User deleted successfully.');
+            errorMessage = "User deleted successfully.";
+            const imagePath = '/Bapan/React/frontend_nomi/src/images/product/'+req.body.image;
+            fs.unlink(imagePath, (err) => {
+                if (err) {
+                  console.error('Error deleting the image:', err);
+                  return;
+                }
+              
+                console.log('Image deleted successfully.');
+            });
+        } else {
+            console.log('User not found.');
+            errorMessage = "User not found.";
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        errorMessage = 'Error deleting user:';
+    }
+
+    return res.status(200).send(errorMessage);
+}
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage
 }

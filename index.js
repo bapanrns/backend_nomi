@@ -45,6 +45,7 @@ const Product = require("./app/models/productModel");
 
 const Quantity = require("./app/models/quantityModel");
 //Quantity.sync({ force: true })
+//Quantity.sync({ alter: true })
 
 /* Relationship of Sub Category  and Product table */
 Category.hasMany(Product,{
@@ -97,6 +98,21 @@ productImageModel.belongsTo(Product,{
 const GroupModal = require("./app/models/groupModal");
 //GroupModal.sync({ force: true })
 
+
+const ShopModal = require("./app/models/shopDetailsModal");
+//ShopModal.sync({ force: true })
+
+const BuyProductModal = require("./app/models/buyProductDetailsModal");
+//BuyProductModal.sync({ force: true })
+ 
+ShopModal.hasMany(BuyProductModal,{
+    foreignKey: 'shop_id',
+    as: 'Buy_Product_Details'
+});
+BuyProductModal.belongsTo(ShopModal,{
+    foreignKey: 'shop_id',
+    as: 'Shop_Details'
+});
 
 // Set up the middleware to parse incoming requests
 app.use(bodyParser.json({ limit: '50mb' }));

@@ -26,6 +26,14 @@ Quantity.init({
   size:{
     type: DataTypes.STRING(15),
     allowNull: true
+  },
+  buy_price:{
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  sell_price: {
+    type: DataTypes.FLOAT,
+    allowNull: false
   }
 }, {
   // Other model options go here
