@@ -79,7 +79,7 @@ Quantity.belongsTo(Product,{
 });
 
 const productImageModel = require("./app/models/productImageModel");
-//productImageModel.sync({ force: true })
+//productImageModel.sync({ alter: true })
 
 /* Relationship of Product and Product Image table */
 

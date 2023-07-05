@@ -218,11 +218,11 @@ async function fileCheck(fileLink){
 
 async function AllBuyProductDetails(req, res){
     let whereCluse = {}
-    if(req.body.shop_id !=""){
+    if(req.body.shop_id !="" && req.body.shop_id !== undefined){
         whereCluse['shop_id'] = req.body.shop_id;
     }
 
-    if(req.body.transition_type !=""){
+    if(req.body.transition_type !="" && req.body.transition_type !== undefined){
         whereCluse['transition_type'] = req.body.transition_type;
     }
     
@@ -251,6 +251,7 @@ async function AllBuyProductDetails(req, res){
             const inner_hash = {
                 id: product.dataValues.id,
                 shop_name: product.dataValues.Shop_Details.dataValues.shop_name,
+                shop_id: product.dataValues.Shop_Details.dataValues.id,
                 buy_price: product.dataValues.buy_price,
                 discount_amount: product.dataValues.discount_amount,
                 transport_amount: product.dataValues.transport_amount,

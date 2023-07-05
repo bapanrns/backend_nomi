@@ -18,6 +18,10 @@ Product_Image.init({
     image_url:{
         type: DataTypes.TEXT,
         allowNull: true
+    },primary: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: true
     }
 }, {
   // Other model options go here

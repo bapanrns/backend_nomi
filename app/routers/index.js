@@ -11,7 +11,7 @@ const {handalSaveSubCategory, handalAllSubCategory, handalFindSubCategoryById, h
 // Product Fabric Controller
 const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById} = require('../controllers/productFabricController')
 // Product Controller
-const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage} = require('../controllers/productController')
+const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage} = require('../controllers/productController')
 // Buy Controller
 const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList } = require('../controllers/buyController')
 
@@ -62,7 +62,10 @@ router.route("/AllProduct").post(handalAllProduct);
 router.route("/ProductFindById").post(handalFindProductById);
 router.route("/deleteProduct").post(handalDeleteProductById);
 router.route("/UpdateGroupID").post(handalUpdateGroupId);
-router.route("/deleteProductImage").post(handalDeleteProductImage)
+router.route("/deleteProductImage").post(handalDeleteProductImage);
+router.route("/productAactiveInactive").post(productAactiveInactive);
+router.route("/findProductImage").post(findProductImage);
+router.route("/setPrimaryImage").post(setPrimaryImage);
 
 // -------------------- Shop -----------------------
 router.route("/shopAdd").post(SaveShopDetails);

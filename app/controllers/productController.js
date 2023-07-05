@@ -19,7 +19,15 @@ async function handalSaveProduct(req, res){
    // console.log(`Received name: ${name}`);
     console.log(req.body);
 
+    let productId = 0;
     const returnMessage = "";
+    const bill_id_and_shop_id = req.body.bill_id_and_shop_id;
+    let bill_id = 0;
+    let shop_id = 0;
+    if (bill_id_and_shop_id !="" && bill_id_and_shop_id != undefined){
+        bill_id = bill_id_and_shop_id.split("@")[0];
+        shop_id = bill_id_and_shop_id.split("@")[1];
+    }
     const saveHash = {
                     category_id: req.body.category_id, 
                     sub_category_id: req.body.sub_category_id,  
@@ -27,10 +35,7 @@ async function handalSaveProduct(req, res){
                     active_status: req.body.active_status,  
                     company_name: req.body.company_name,  
                     year_month: req.body.year_month,  
-                    product_original_price: req.body.product_original_price, 
-                    product_selling_price: req.body.product_selling_price, 
                     product_offer_percentage: req.body.product_offer_percentage, 
-                    product_offer_price: req.body.product_offer_price,
                     delivery_charges: req.body.delivery_charges,
                     product_febric_id: req.body.product_febric_id, 
                     product_febric: req.body.product_febric, 
@@ -39,22 +44,144 @@ async function handalSaveProduct(req, res){
                     blouse: req.body.blouse,
                     blouse_length: req.body.blouse_length,
                     weight: req.body.weight,
-                    youtube_link: req.body.youtube_link
+                    youtube_link: req.body.youtube_link,
+                    fabric_care: req.body.fabric_care,
+                    bill_id: bill_id,
+                    shop_id: shop_id
                 }
     if(req.body.id > 0){
         // Edit
+        productId = req.body.id;
         await ProductModel.update(saveHash, {
             where: {
-                id: req.body.id
+                id: productId
             }
         });
+        // ---------------------------------------------------------------------------------------------------------------
+        // ------------------------------------ Quantity Update and Insert -----------------------------------------------
+        // ---------------------------------------------------------------------------------------------------------------
+
+        // **************************** Quantity *************************************
+        const quantity_hash = await createQuantityHash(productId, 
+                                    req.body.quantity,
+                                    size="", 
+                                    req.body.quantity_buy_price, 
+                                    req.body.quantity_selling_price
+                                    );
+
+        if(req.body.quantity_id > 0 ){
+            // Update
+            updateProductQuantity(req.body.quantity_id, quantity_hash);
+        }else if(parseInt(req.body.quantity, 10) > 0){
+            // Insert
+            quantityModel.create(quantity_hash);
+        }
+
+        // **************************** XS Quantity *************************************
+        const quantityXs_hash = await createQuantityHash(productId, 
+                                    req.body.quantityXs,
+                                    size="XS", 
+                                    req.body.quantityXs_buy_price, 
+                                    req.body.quantityXs_selling_price
+                                    );
+
+        if(req.body.quantity_Xs_id > 0 ){
+            // Update
+            updateProductQuantity(req.body.quantity_Xs_id, quantityXs_hash);
+        }else if(parseInt(req.body.quantityXs, 10) > 0){
+            // Insert
+            quantityModel.create(quantityXs_hash);
+        }        
+
+        // **************************** S Quantity *************************************
+        const quantityS_hash = await createQuantityHash(productId, 
+                                    req.body.quantityS,
+                                    size="S", 
+                                    req.body.quantityS_buy_price, 
+                                    req.body.quantityS_selling_price
+                                    );
+
+        if(req.body.quantity_S_id > 0 ){
+            // Update
+            updateProductQuantity(req.body.quantity_S_id, quantityS_hash);
+        }else if(parseInt(req.body.quantityS, 10) > 0){
+            // Insert
+            quantityModel.create(quantityS_hash);
+        }
+
+        // **************************** L Quantity *************************************
+        const quantityL_hash = await createQuantityHash(productId, 
+                                    req.body.quantityL,
+                                    size="L", 
+                                    req.body.quantityL_buy_price, 
+                                    req.body.quantityL_selling_price
+                                    );
+
+        if(req.body.quantity_L_id > 0 ){
+            // Update
+            updateProductQuantity(req.body.quantity_L_id, quantityL_hash);
+        }else if(parseInt(req.body.quantityL, 10) > 0){
+            // Insert
+            quantityModel.create(quantityL_hash);
+        }
+
+        // **************************** M Quantity *************************************
+        const quantityM_hash = await createQuantityHash(productId, 
+                                    req.body.quantityM,
+                                    size="M", 
+                                    req.body.quantityM_buy_price, 
+                                    req.body.quantityM_selling_price
+                                    );
+
+        if(req.body.quantity_M_id > 0 ){
+            // Update
+            updateProductQuantity(req.body.quantity_M_id, quantityM_hash);
+        }else if(parseInt(req.body.quantityM, 10) > 0){
+            // Insert
+            quantityModel.create(quantityM_hash);
+        }
+
+        // **************************** XL Quantity *************************************
+        const quantity_Xl_hash = await createQuantityHash(productId, 
+                                    req.body.quantityXl,
+                                    size="XL", 
+                                    req.body.quantityXl_buy_price, 
+                                    req.body.quantityXl_selling_price
+                                    );
+
+        if(req.body.quantity_Xl_id > 0 ){
+            // Update
+            updateProductQuantity(req.body.quantity_Xl_id, quantity_Xl_hash);
+        }else if(parseInt(req.body.quantityXl, 10) > 0){
+            // Insert
+            quantityModel.create(quantity_Xl_hash);
+        }
+
+        // **************************** 2XL Quantity *************************************
+        const quantity_2Xl_hash = await createQuantityHash(productId, 
+                                    req.body.quantity2Xl,
+                                    size="2XL", 
+                                    req.body.quantity2Xl_buy_price, 
+                                    req.body.quantity2Xl_selling_price
+                                    );
+
+        if(req.body.quantity_2Xl_id > 0 ){
+            // Update
+            updateProductQuantity(req.body.quantity_2Xl_id, quantity_2Xl_hash);
+        }else if(parseInt(req.body.quantity2Xl, 10) > 0){
+            // Insert
+            quantityModel.create(quantity_2Xl_hash);
+        }
         
     }else{
-        // Add
+        // ---------------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------- Product Insert -----------------------------------------------
+        // ---------------------------------------------------------------------------------------------------------------
+
         const product = await ProductModel.create(saveHash);
-        /* Image Upload */
-        if(product.dataValues.id > 0){
-            
+        productId = product.dataValues.id;
+        //  ******************************* Image Upload *********************************
+        if(productId > 0){
             const imageArray = [];
             if(req.body.images1 !== null){
                 imageArray.push(req.body.images1);
@@ -76,90 +203,166 @@ async function handalSaveProduct(req, res){
                 base64Image = imageArray[i];
                 const decodedImage = uploadMiddleware.decodeBase64Image(base64Image);
                 const imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/product/'+decodedImage.name);
-                // Save product Images
+                // ********************* Save product Images **************************************
                 const productImage = await productImageModel.create({
                         product_id: product.dataValues.id,
                         image_name: decodedImage.name,
                         image_url: imagePath
                     });
                 if(productImage.dataValues.id > 0){
-                    // Transfer image
+                    // ******************* Transfer image *******************************************
                     fs.writeFileSync(imagePath, decodedImage.data);
                 }
             }
+
+            // ---------------------------------------------------------------------------------------------------------------
+            // ------------------------------------ Quantity Insert -----------------------------------------------
+            // ---------------------------------------------------------------------------------------------------------------
+
+            const quantityArray = [];
+            if (req.body.quantity > 0){
+                quantityArray.push(
+                    {
+                        product_id: productId,
+                        no_of_product: req.body.quantity,
+                        size: "",
+                        buy_price: req.body.quantity_buy_price,
+                        sell_price: req.body.quantity_selling_price
+                    }
+                )
+            }
+            if (req.body.quantityXs > 0){
+                quantityArray.push(
+                    {
+                        product_id: productId,
+                        no_of_product: req.body.quantityXs,
+                        size: "XS",
+                        buy_price: req.body.quantityXs_buy_price,
+                        sell_price: req.body.quantityXs_selling_price
+                    }
+                )
+            }
+            if (req.body.quantityS > 0){
+                quantityArray.push(
+                    {
+                        product_id: productId,
+                        no_of_product: req.body.quantityS,
+                        size: "S",
+                        buy_price: req.body.quantityS_buy_price,
+                        sell_price: req.body.quantityS_selling_price
+                    }
+                )
+            }
+            if (req.body.quantityL > 0){
+                quantityArray.push(
+                    {
+                        product_id: productId,
+                        no_of_product: req.body.quantityL,
+                        size: "L",
+                        buy_price: req.body.quantityL_buy_price,
+                        sell_price: req.body.quantityL_selling_price
+                    }
+                )
+            }
+            if (req.body.quantityM > 0){
+                quantityArray.push(
+                    {
+                        product_id: productId,
+                        no_of_product: req.body.quantityM,
+                        size: "M",
+                        buy_price: req.body.quantityM_buy_price,
+                        sell_price: req.body.quantityM_selling_price
+                    }
+                )
+            }
+            if (req.body.quantityXl > 0){
+                quantityArray.push(
+                    {
+                        product_id: productId,
+                        no_of_product: req.body.quantityXl,
+                        size: "XL",
+                        buy_price: req.body.quantityXl_buy_price,
+                        sell_price: req.body.quantityXl_selling_price
+                    }
+                )
+            }
+
+            if (req.body.quantity2Xl > 0){
+                quantityArray.push(await createQuantityHash(productId, 
+                                                    req.body.quantity2Xl,
+                                                    size="2XL", 
+                                                    req.body.quantity2Xl_buy_price, 
+                                                    req.body.quantity2Xl_selling_price
+                                                    )
+                                                );
+            }
+
+            //console.log(quantityArray);
+            const quantity = await quantityModel.bulkCreate(quantityArray);
         }
-        const quantityArray = [];
-        if (req.body.quantity > 0){
-            quantityArray.push(
-                {
-                    product_id: product.dataValues.id,
-                    no_of_product: req.body.quantity,
-                    size: ""
-                }
-            )
-        }
-        if (req.body.quantityXs > 0){
-            //quantityHash["quantity"] = req.body.quantityXs;
-            quantityArray.push(
-                {
-                    product_id: product.dataValues.id,
-                    no_of_product: req.body.quantityXs,
-                    size: "XS"
-                }
-            )
-        }
-        if (req.body.quantityS > 0){
-            quantityArray.push(
-                {
-                    product_id: product.dataValues.id,
-                    no_of_product: req.body.quantityS,
-                    size: "S"
-                }
-            )
-        }
-        if (req.body.quantityL > 0){
-            quantityArray.push(
-                {
-                    product_id: product.dataValues.id,
-                    no_of_product: req.body.quantityL,
-                    size: "L"
-                }
-            )
-        }
-        if (req.body.quantityM > 0){
-            quantityArray.push(
-                {
-                    product_id: product.dataValues.id,
-                    no_of_product: req.body.quantityM,
-                    size: "M"
-                }
-            )
-        }
-        if (req.body.quantityXl > 0){
-            quantityArray.push(
-                {
-                    product_id: product.dataValues.id,
-                    no_of_product: req.body.quantityXl,
-                    size: "XL"
-                }
-            )
-        }
-        
-        if (req.body.quantity2Xl > 0){
-            quantityArray.push(
-                {
-                    product_id: product.dataValues.id,
-                    no_of_product: req.body.quantity2Xl,
-                    size: "2XL"
-                }
-            )
-        }
-        console.log(quantityArray);
-        const quantity = await quantityModel.bulkCreate(quantityArray);
-        console.log(product.dataValues.id);
     }
 
+    console.log("productId", productId);
+
+    if(productId > 0){
+        const imageArray = [];
+        if(req.body.images1 !== ""){
+            imageArray.push(req.body.images1);
+        }
+        if(req.body.images2 !== ""){
+            imageArray.push(req.body.images2);
+        }
+        if(req.body.images3 !== ""){
+            imageArray.push(req.body.images3);
+        }
+        if(req.body.images4 !== ""){
+            imageArray.push(req.body.images4);
+        }
+        if(req.body.images5 !== ""){
+            imageArray.push(req.body.images5);
+        }
+
+        for (let i = 0; i < imageArray.length; i++) {
+            base64Image = imageArray[i];
+            const decodedImage = uploadMiddleware.decodeBase64Image(base64Image);
+            const imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/product/'+decodedImage.name);
+            // ********************* Save product Images **************************************
+            const productImage = await productImageModel.create({
+                    product_id: productId,
+                    image_name: decodedImage.name,
+                    image_url: imagePath
+                });
+            if(productImage.dataValues.id > 0){
+                // ******************* Transfer image *******************************************
+                fs.writeFileSync(imagePath, decodedImage.data);
+            }
+        }
+    }
     return res.status(200).send("Save Successfully");
+}
+
+async function createQuantityHash(id="", no_of_product=0, size="", buy_price=0, sell_price=0){
+    const inner_hash = {
+        product_id: id,
+        no_of_product: no_of_product,
+        size: size,
+        buy_price: buy_price,
+        sell_price: sell_price
+    }
+    return inner_hash;
+}
+
+async function updateProductQuantity(id, updateHash){
+    console.log("updateProductQuantity:", id, "=>", updateHash);
+    await quantityModel.update(
+        updateHash, 
+        { where: { id: id } } 
+    ).then((count) => {
+        console.log(`Updated ${count} record(s).`);
+      })
+      .catch((error) => {
+        console.error('Error occurred during update:', error);
+    });
 }
 
 async function handalAllProduct(req, res){
@@ -219,18 +422,19 @@ async function handalAllProduct(req, res){
                     //console.log('---------------------------');
                     //console.log('Post:', quantityS.toJSON());
                     quantityArray.push(quantity.no_of_product);
+                    let quantity_price = quantity.no_of_product+" => "+quantity.buy_price+" => "+quantity.sell_price;
                     if(quantity.size == "XS"){
-                        inner_hash['quantity_xs'] = quantity.no_of_product;
+                        inner_hash['quantity_xs'] = quantity_price;
                     }else if(quantity.size == "S"){
-                        inner_hash['quantity_s'] = quantity.no_of_product;
+                        inner_hash['quantity_s'] = quantity_price;
                     }else if(quantity.size == "L"){
-                        inner_hash['quantity_l'] = quantity.no_of_product;
+                        inner_hash['quantity_l'] = quantity_price;
                     }else if(quantity.size == "M"){
-                        inner_hash['quantity_m'] = quantity.no_of_product;
+                        inner_hash['quantity_m'] = quantity_price;
                     }else if(quantity.size == "XL"){
-                        inner_hash['quantity_xl'] = quantity.no_of_product;
+                        inner_hash['quantity_xl'] = quantity_price;
                     }else if(quantity.size == "2XL"){
-                        inner_hash['quantity_2xl'] = quantity.no_of_product;
+                        inner_hash['quantity_2xl'] = quantity_price;
                     }
                 });
 
@@ -261,31 +465,52 @@ async function handalFindProductById(req, res){
         active_status: "",
         company_name: "",
         year_month: "",
-        product_original_price: "",
-        product_selling_price: "",
         product_offer_percentage: "",
         delivery_charges: "",
         quantity: "",
+        quantity_id: "",
+        quantity_buy_price: "",
+        quantity_selling_price: "",
         quantityXs: "",
+        quantity_Xs_id: "",
+        quantityXs_buy_price: "",
+        quantityXs_selling_price: "",
         quantityS: "",
+        quantity_S_id: "",
+        quantityS_buy_price: "",
+        quantityS_selling_price: "",
         quantityL: "",
+        quantity_L_id: "",
+        quantityL_buy_price: "",
+        quantityL_selling_price: "",
         quantityM: "",
+        quantity_M_id: "",
+        quantityM_buy_price: "",
+        quantityM_selling_price: "",
         quantityXl: "",
+        quantity_Xl_id: "",
+        quantityXl_buy_price: "",
+        quantityXl_selling_price: "",
         quantity2Xl: "",
+        quantity_2Xl_id: "",
+        quantity2Xl_buy_price: "",
+        quantity2Xl_selling_price: "",
         product_febric_id: "",
         product_febric: "",
         color: [],
-        product_offer_price: "",
-        images1: null,
-        images2: null,
-        images3: null,
-        images4: null,
-        images5: null,
+        imageArray: [],
+        images1: "",
+        images2: "",
+        images3: "",
+        images4: "",
+        images5: "",
         saree_length: 5.5,
         blouse: "No",
         blouse_length: ".8",
         weight:"",
-        youtube_link: ""
+        youtube_link: "",
+        fabric_care: "",
+        bill_id_and_shop_id: ""
     }
     if(id !=""){
         let whereCluse = {}
@@ -322,19 +547,18 @@ async function handalFindProductById(req, res){
                 productHash['active_status'] = product.active_status;
                 productHash['company_name'] = product.company_name;
                 productHash['year_month'] = product.year_month;
-                productHash['product_original_price'] = product.product_original_price;
-                productHash['product_selling_price'] = product.product_selling_price;
                 productHash['product_offer_percentage'] = product.product_offer_percentage;
-                productHash['product_offer_price'] = product.product_offer_price;
                 productHash['product_febric'] = product.product_febric;
                 productHash['product_febric_id'] = product.product_febric_id;
-                productHash['color'] = product.color;
+                productHash['color'] = product.color.split(", ");
                 productHash['saree_length'] = product.saree_length;
                 productHash['blouse'] = product.blouse;
                 productHash['blouse_length'] = product.blouse_length;
                 productHash['weight'] = product.weight;
                 productHash['youtube_link'] = product.youtube_link;
                 productHash['delivery_charges'] = product.delivery_charges;
+                productHash['fabric_care'] = product.fabric_care;
+                productHash['bill_id_and_shop_id'] = product.bill_id+"@"+product.shop_id;
 
                 const quantityArray = [];
                 product.Quantity.forEach((quantity) => {
@@ -343,24 +567,47 @@ async function handalFindProductById(req, res){
                     quantityArray.push(quantity.no_of_product);
                     if(quantity.size == "XS"){
                         productHash['quantityXs'] = quantity.no_of_product;
+                        productHash['quantity_Xs_id'] = quantity.id;
+                        productHash['quantityXs_buy_price'] = quantity.buy_price;
+                        productHash['quantityXs_selling_price'] = quantity.sell_price;
                     }else if(quantity.size == "S"){
                         productHash['quantityS'] = quantity.no_of_product;
+                        productHash['quantity_S_id'] = quantity.id;
+                        productHash['quantityS_buy_price'] = quantity.buy_price;
+                        productHash['quantityS_selling_price'] = quantity.sell_price;
                     }else if(quantity.size == "L"){
                         productHash['quantityL'] = quantity.no_of_product;
+                        productHash['quantity_L_id'] = quantity.id;
+                        productHash['quantityL_buy_price'] = quantity.buy_price;
+                        productHash['quantityL_selling_price'] = quantity.sell_price;
                     }else if(quantity.size == "M"){
                         productHash['quantityM'] = quantity.no_of_product;
+                        productHash['quantity_M_id'] = quantity.id;
+                        productHash['quantityM_buy_price'] = quantity.buy_price;
+                        productHash['quantityM_selling_price'] = quantity.sell_price;
                     }else if(quantity.size == "XL"){
                         productHash['quantityXl'] = quantity.no_of_product;
+                        productHash['quantity_Xl_id'] = quantity.id;
+                        productHash['quantityXl_buy_price'] = quantity.buy_price;
+                        productHash['quantityXl_selling_price'] = quantity.sell_price;
                     }else if(quantity.size == "2XL"){
                         productHash['quantity2Xl'] = quantity.no_of_product;
+                        productHash['quantity_2Xl_id'] = quantity.id;
+                        productHash['quantity2Xl_buy_price'] = quantity.buy_price;
+                        productHash['quantity2Xl_selling_price'] = quantity.sell_price;
                     }else{
                         productHash['quantity'] = quantity.no_of_product;
+                        productHash['quantity_id'] = quantity.id;
+                        productHash['quantity_buy_price'] = quantity.buy_price;
+                        productHash['quantity_selling_price'] = quantity.sell_price;
                     }
                 });
-                
+                let imageArray = [];
                 product.Product_Image.forEach((productImage, key) => {
-                    productHash['images'+(key+1)] = productImage.image_name;
+                    //productHash['images'+(key+1)] = productImage.image_name;
+                    imageArray.push(productImage.image_name);
                 })
+                productHash['imageArray'] = imageArray;
             });
             
         })
@@ -368,11 +615,6 @@ async function handalFindProductById(req, res){
          console.error('Error:', error);
         });
     }
-
-
-
-
-    
     return res.status(200).send(productHash);
 }
 
@@ -458,7 +700,58 @@ async function handalDeleteProductImage(req, res){
 
     return res.status(200).send(errorMessage);
 }
+
+async function productAactiveInactive(req, res){
+    let errorMessage = "";
+    await ProductModel.update(
+        {active_status: req.body.active_status}, 
+        { where: { id: req.body.id } } 
+    ).then((count) => {
+        errorMessage = `Updated ${count} record(s).`;
+    })
+      .catch((error) => {
+        errorMessage = 'Error occurred during update';
+    });
+
+    return res.status(200).send(errorMessage);
+}
+
+async function findProductImage(req, res){
+    console.log("req.body.product_id", req.body.product_id);
+    const productImageObj = await productImageModel.findAll({
+        where: {
+            product_id: req.body.product_id
+        }, order: [
+            ['primary', 'DESC']
+        ]
+    })
+    return res.status(200).send(productImageObj);
+}
+
+async function setPrimaryImage(req, res){
+    let errorMessage = "";
+    await productImageModel.update(
+        {primary: 0}, 
+        { where: { product_id: req.body.product_id } } 
+    ).then((count) => {
+        if(count > 0){
+            productImageModel.update(
+                {primary: 1}, 
+                { where: { id: req.body.id } } 
+            ).then((count1) => {
+                errorMessage = `Updated ${count1} record(s).`;
+            })
+        }else{
+            errorMessage = `Error occurred during update`;
+        }
+    })
+      .catch((error) => {
+        errorMessage = 'Error occurred during update';
+    });
+
+    return res.status(200).send(errorMessage);
+}
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage
 }

@@ -34,11 +34,11 @@ Product.init({
     },
     product_original_price:{
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: true
     },
     product_selling_price:{
        type: DataTypes.FLOAT,
-       allowNull: false
+       allowNull: true
     },
     product_offer_percentage:{
        type: DataTypes.INTEGER,
@@ -86,6 +86,18 @@ Product.init({
     },
     youtube_link:{
         type: DataTypes.TEXT,
+        allowNull: true
+    },
+    fabric_care:{
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    bill_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    shop_id: {
+        type: DataTypes.INTEGER,
         allowNull: true
     }
 }, {
