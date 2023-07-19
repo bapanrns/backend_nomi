@@ -99,6 +99,13 @@ Product.init({
     shop_id: {
         type: DataTypes.INTEGER,
         allowNull: true
+    },
+    care_instruction: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },occasion: {
+        type: DataTypes.STRING(255),
+        allowNull: true
     }
 }, {
   // Other model options go here

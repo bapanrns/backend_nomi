@@ -30,9 +30,9 @@ async function handalAllProductFabric(req, res){
     //SubCategoryModel.findAll({ include: [ CategoryModel ], order: [ [ CategoryModel, 'category_name' ] ] });
 
 
-    const category = await ProductFabricModel.findAll({ order: [["product_fabric_name", "ASC"]] });
+    const fabric = await ProductFabricModel.findAll({ order: [["product_fabric_name", "ASC"]] });
     //console.log("All users:", JSON.stringify(JSON.stringify, null, 2));
-    return res.status(200).send(category);
+    return res.status(200).send(fabric);
 }
 
 async function handalFindProductFabricById(req, res){
@@ -51,7 +51,23 @@ async function handalDeleteProductFabricById(req, res){
     });
     return res.status(200).send("Deleted Successfully");
 }
+
+async function fetchFabricForFontend(req, res){
+    let fabricArray = [];
+    await ProductFabricModel.findAll()
+    .then((fabric) => {
+        // Access the data from the three tables
+        //console.log(products)
+        fabric.forEach((product) => {
+            let inner_hash = {};
+            inner_hash['id'] = product.id;
+            inner_hash['label'] = product.product_fabric_name;
+            fabricArray.push(inner_hash);
+        })
+    })
+    return res.status(200).send(fabricArray);
+}
  
 module.exports = {
-    handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById
+    handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById, fetchFabricForFontend
 }

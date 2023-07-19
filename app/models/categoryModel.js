@@ -15,6 +15,10 @@ Category.init({
         type: DataTypes.TINYINT,
         allowNull: true,
         defaultValue: 0
+    },
+    cat_image:{
+        type: DataTypes.TEXT,
+        allowNull: true
     }
 }, {
   // Other model options go here

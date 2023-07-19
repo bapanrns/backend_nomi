@@ -4,12 +4,31 @@ const CategoryModel = require("../models/categoryModel");
 
 
 async function handalSaveCategory(req, res){
-    //const { name } = req.body;
-   // console.log(`Received name: ${name}`);
-   // console.log(req.body);
-
-    const jane = await CategoryModel.create({ category_name: req.body.name, active_status: req.body.status });
-    console.log(jane.toJSON());
+    let returnMessage = "";
+    let category = null;
+    const categoryHash = {
+        category_name: req.body.category_name, 
+        active_status: req.body.active_status
+    }
+    if(req.body.id > 0){
+        // Edit
+        category = await CategoryModel.update(categoryHash, {
+            where: {
+                id: req.body.id
+            }
+        });
+        if(category.length > 0){
+            returnMessage = "Update successfully";
+        }
+    }else{
+        // Insert
+        category = await CategoryModel.create(categoryHash);
+        if(category.id > 0){
+            returnMessage = "Insert successfully";
+        }
+    }
+    
+    return res.status(200).send(returnMessage);
 }
 
 async function handalAllCategory(req, res){
@@ -24,7 +43,15 @@ async function handalFindCategoryById(req, res){
     //console.log("All users:", JSON.stringify(JSON.stringify, null, 2));
     return res.status(200).send(category);
 }
+
+async function getCategoryList(req, res){
+    const category = await CategoryModel.findAll({
+        where: {active_status: 1}
+    });
+    //console.log("All users:", JSON.stringify(JSON.stringify, null, 2));
+    return res.status(200).send(category);
+}
  
 module.exports = {
-    handalSaveCategory, handalAllCategory, handalFindCategoryById
+    handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList
 }

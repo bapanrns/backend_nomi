@@ -17,7 +17,11 @@ User.init({
     },
     phone:{
         type: DataTypes.STRING(15),
-        allowNull: false
+        allowNull: false,
+        unique: true,
+        validate: {
+          is: /^\+?[1-9]\d{1,14}$/,
+        },
     },
     whatsapp:{
         type: DataTypes.STRING(15),
@@ -34,6 +38,9 @@ User.init({
     user_type:{
        type: DataTypes.STRING,
        defaultValue: "user"
+    },gender:{
+        type: DataTypes.STRING(10),
+        allowNull: true
     }
 }, {
   // Other model options go here

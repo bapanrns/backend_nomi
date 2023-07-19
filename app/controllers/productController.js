@@ -182,39 +182,6 @@ async function handalSaveProduct(req, res){
         productId = product.dataValues.id;
         //  ******************************* Image Upload *********************************
         if(productId > 0){
-            const imageArray = [];
-            if(req.body.images1 !== null){
-                imageArray.push(req.body.images1);
-            }
-            if(req.body.images2 !== null){
-                imageArray.push(req.body.images2);
-            }
-            if(req.body.images3 !== null){
-                imageArray.push(req.body.images3);
-            }
-            if(req.body.images4 !== null){
-                imageArray.push(req.body.images4);
-            }
-            if(req.body.images5 !== null){
-                imageArray.push(req.body.images5);
-            }
-
-            for (let i = 0; i < imageArray.length; i++) {
-                base64Image = imageArray[i];
-                const decodedImage = uploadMiddleware.decodeBase64Image(base64Image);
-                const imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/product/'+decodedImage.name);
-                // ********************* Save product Images **************************************
-                const productImage = await productImageModel.create({
-                        product_id: product.dataValues.id,
-                        image_name: decodedImage.name,
-                        image_url: imagePath
-                    });
-                if(productImage.dataValues.id > 0){
-                    // ******************* Transfer image *******************************************
-                    fs.writeFileSync(imagePath, decodedImage.data);
-                }
-            }
-
             // ---------------------------------------------------------------------------------------------------------------
             // ------------------------------------ Quantity Insert -----------------------------------------------
             // ---------------------------------------------------------------------------------------------------------------
@@ -306,31 +273,52 @@ async function handalSaveProduct(req, res){
 
     if(productId > 0){
         const imageArray = [];
+        let primary = 0;
         if(req.body.images1 !== ""){
-            imageArray.push(req.body.images1);
+            if(req.body.primary === "images1"){
+                primary = 1;
+            }
+            imageArray.push({img: req.body.images1, primary: primary});
         }
         if(req.body.images2 !== ""){
-            imageArray.push(req.body.images2);
+            primary = 0;
+            if(req.body.primary === "images2"){
+                primary = 1;
+            }
+            imageArray.push({img: req.body.images2, primary: primary});
         }
         if(req.body.images3 !== ""){
-            imageArray.push(req.body.images3);
+            primary = 0;
+            if(req.body.primary === "images3"){
+                primary = 1;
+            }
+            imageArray.push({img: req.body.images3, primary: primary});
         }
         if(req.body.images4 !== ""){
-            imageArray.push(req.body.images4);
+            primary = 0;
+            if(req.body.primary === "images4"){
+                primary = 1;
+            }
+            imageArray.push({img: req.body.images4, primary: primary});
         }
         if(req.body.images5 !== ""){
-            imageArray.push(req.body.images5);
+            primary = 0;
+            if(req.body.primary === "images5"){
+                primary = 1;
+            }
+            imageArray.push({img: req.body.images5, primary: primary});
         }
 
         for (let i = 0; i < imageArray.length; i++) {
             base64Image = imageArray[i];
-            const decodedImage = uploadMiddleware.decodeBase64Image(base64Image);
+            const decodedImage = uploadMiddleware.decodeBase64Image(base64Image.img);
             const imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/product/'+decodedImage.name);
             // ********************* Save product Images **************************************
             const productImage = await productImageModel.create({
                     product_id: productId,
                     image_name: decodedImage.name,
-                    image_url: imagePath
+                    image_url: imagePath,
+                    primary: base64Image.primary
                 });
             if(productImage.dataValues.id > 0){
                 // ******************* Transfer image *******************************************
@@ -435,6 +423,8 @@ async function handalAllProduct(req, res){
                         inner_hash['quantity_xl'] = quantity_price;
                     }else if(quantity.size == "2XL"){
                         inner_hash['quantity_2xl'] = quantity_price;
+                    }else{
+                        inner_hash['quantity'] = quantity_price;
                     }
                 });
 
@@ -603,11 +593,14 @@ async function handalFindProductById(req, res){
                     }
                 });
                 let imageArray = [];
+                let imageHash = {};
                 product.Product_Image.forEach((productImage, key) => {
                     //productHash['images'+(key+1)] = productImage.image_name;
                     imageArray.push(productImage.image_name);
+                    imageHash[productImage.image_name] = {id: productImage.id, product_id: productImage.product_id, primary: productImage.primary}
                 })
                 productHash['imageArray'] = imageArray;
+                productHash['imageHash'] = imageHash;
             });
             
         })
@@ -670,35 +663,49 @@ async function findProductSubCategory(product_ids){
 
 async function handalDeleteProductImage(req, res){
     let errorMessage = "";
+    let errorMessage2 = "";
     try {
-        const deletedUser = await productImageModel.destroy({
+        productImageModel.findOne({
             where: {
-                image_name: req.body.image,
+                id: req.body.image_id, // Specify the condition to match (e.g., id = 1)
+                product_id: req.body.product_id
             },
-        });
-    
-        if (deletedUser === 1) {
-            console.log('User deleted successfully.');
-            errorMessage = "User deleted successfully.";
-            const imagePath = '/Bapan/React/frontend_nomi/src/images/product/'+req.body.image;
-            fs.unlink(imagePath, (err) => {
-                if (err) {
-                  console.error('Error deleting the image:', err);
-                  return;
+        })
+        .then(images => {
+            if(images.dataValues.primary === 1){
+                errorMessage2 = ".\nPlease set Primary Image"
+            }
+            
+            const deletedImages = productImageModel.destroy({
+                where: {
+                    id: req.body.image_id, 
+                    product_id: req.body.product_id
+                },
+            }).then(images =>{
+                if (images === 1) {
+                    console.log('Image deleted successfully.');
+                    errorMessage = "Image deleted successfully.";
+                    const imagePath = '/Bapan/React/frontend_nomi/src/images/product/'+req.body.image;
+                    fs.unlink(imagePath, (err) => {
+                        if (err) {
+                        console.error('Error deleting the image:', err);
+                        return;
+                        }
+                    
+                        console.log('Image deleted successfully.');
+                    });
+                } else {
+                    console.log('Image not found.');
+                    errorMessage = "Image not found.";
                 }
-              
-                console.log('Image deleted successfully.');
             });
-        } else {
-            console.log('User not found.');
-            errorMessage = "User not found.";
-        }
+        })
     } catch (error) {
-        console.error('Error deleting user:', error);
-        errorMessage = 'Error deleting user:';
+        console.error('Error deleting Image:', error);
+        errorMessage = 'Error deleting Image:';
     }
 
-    return res.status(200).send(errorMessage);
+    return res.status(200).send(errorMessage+" "+errorMessage2);
 }
 
 async function productAactiveInactive(req, res){
@@ -751,7 +758,352 @@ async function setPrimaryImage(req, res){
 
     return res.status(200).send(errorMessage);
 }
+
+async function fetchItemTypeList(req, res) {
+    let subCategoryArry = [];
+  
+    try {
+        const category = await categoryModel.findOne({
+            where: {
+                category_name: {
+                    [Op.like]: `%${req.body.items}%`
+                }
+            }
+        });
+  
+        const subCategories = await subCategoryModel.findAll({
+            where: {
+                category_id: category.dataValues.id
+            }
+        });
+  
+        subCategories.forEach((obj) => {
+            let inner_hash = {};
+            inner_hash['id'] = obj.id;
+            inner_hash['label'] = obj.sub_category_name;
+            subCategoryArry.push(inner_hash);
+        });
+        return res.status(200).send(subCategoryArry);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error occurred');
+    }
+}
+
+async function getItemsList(req, res){
+    console.log("getItemsList");
+    console.log(req.body);
+
+    // Where condition with Active status
+    let whereCluse = {
+        active_status: 1
+    }
+
+    // Fabric Where candition
+    if(req.body.fabric.length > 0){
+        whereCluse['product_febric_id'] = {
+            [Op.in]: req.body.fabric
+        }
+    }
+
+    // Color Where candition
+    if(req.body.color.length > 0){
+        whereCluse[Op.or] = [];
+        req.body.color.forEach((color) => {
+            let inner_hash = {
+                color: {
+                    [Op.like]: `%${color}%`
+                }
+            }
+            whereCluse[Op.or].push(inner_hash);
+        });
+    }
+    
+    let whereInclude = []
+    // Image mmodel
+    whereInclude.push({model: productImageModel, as: 'Product_Image'});
+
+    // For category wise
+    if(req.body.serchFor !=""){
+        whereInclude.push({
+            model: categoryModel, 
+            as: 'Category',
+            where: {
+                category_name: {
+                    [Op.like]: `%${req.body.serchFor}%`
+                }
+            }
+        });
+    }
+
+    // Price Where candition
+    let quantityTableWhereCon = {
+        model: quantityModel,
+        as: 'Quantity',
+        where: {}
+    }
+    if(req.body.price.length > 0){
+        
+        quantityTableWhereCon['where'][Op.or]=[]
+        
+        req.body.price.forEach((priceRange) => {
+            const priceArray = priceRange.split("-");
+            let inner_hash = {
+                sell_price: {
+                    [Op.between]: [priceArray[0], priceArray[1]]
+                }
+            }
+            quantityTableWhereCon['where'][Op.or].push(inner_hash)
+        });
+        // Include condition
+        if (Object.keys(quantityTableWhereCon).length  > 1) {
+            whereInclude.push(quantityTableWhereCon);
+        }
+    }else{
+        whereInclude.push(quantityTableWhereCon);
+    }
+
+    // Type Where candition
+    if(req.body.type.length > 0){
+        whereCluse['sub_category_id'] = {
+            [Op.in]: req.body.type
+        }
+    }
+
+    // Care instruction Where candition
+    if(req.body.careInstruction.length > 0){
+        whereCluse['fabric_care'] = {
+            [Op.in]: req.body.careInstruction
+        }
+    }
+
+    // Discount Where candition
+    if(req.body.discount.length > 0){
+        whereCluse['product_offer_percentage'] = {
+            [Op.in]: req.body.discount
+        }
+    }
+    
+    const productArray = [];
+    let itemsListArray = [];
+    await ProductModel.findAll({
+        where: whereCluse,
+        attributes: ['id', 'product_name', 'product_offer_percentage', 'company_name'],
+        include: whereInclude,
+        order: [
+            ['createdAt', 'DESC'],
+            [{ model: productImageModel, as: 'Product_Image' }, 'primary', 'DESC']
+        ]  
+    })
+    .then((products) => {
+        //console.log(products);
+
+
+        products.forEach((product) => {
+            //console.log('User:', products);
+            let inner_hash = {
+                items_id: product.id,
+                product_offer_percentage: product.product_offer_percentage,
+                product_name: product.product_name,
+                company_name: product.company_name
+            }
+            
+            if(product.Product_Image !=undefined){
+                //console.log("product.Product_Image", product.Product_Image);
+                product.Product_Image.forEach((Product_Image, key) => {
+                    console.log("key", key);
+                    if(key == 0 || Product_Image.primary == 1){
+                        inner_hash['image_name'] = Product_Image.image_name
+                        inner_hash['primary'] = Product_Image.primary
+                    }
+                })
+            }
+
+            //console.log(inner_hash);
+
+            if(product.Quantity !=undefined){
+               // console.log("product.Quantity", product.Quantity);
+                product.Quantity.forEach((quantity) => {
+                    inner_hash['quantity'] = quantity.no_of_product
+                    inner_hash['price'] = quantity.sell_price
+                    
+                    let offerPrice = 0;
+                    if(product.product_offer_percentage > 0){
+                        offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                    }
+                    inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+                })
+            }
+
+            itemsListArray.push(inner_hash);
+        });
+
+    })
+    return res.status(200).send(itemsListArray);
+}
+
+// FrontEnd
+function findItemDetailsUsingId(id, group_id="") {
+    let whereCluse = {}
+    if(group_id ==""){
+        whereCluse["id"] = id;
+    }else{
+        whereCluse["id"] = {
+            [Op.notIn]: [id]
+        }
+
+        whereCluse["group_id"] = {
+            [Op.eq]: group_id
+        }
+    }
+   // console.log(whereCluse);
+   /// return false;
+    return ProductModel.findAll({
+      where: whereCluse,
+      include: [
+        {
+          model: quantityModel,
+          as: 'Quantity'
+        },
+        {
+          model: productImageModel,
+          as: 'Product_Image'
+        }
+      ]
+    });
+}
+
+async function getItemsDetails(req, res){
+    const id = req.body.id;
+    
+    const productObj = await findItemDetailsUsingId(id);
+    // console.log(productObj);
+
+
+
+    const productArray = [];
+    productObj.forEach((productObj) => {
+        const inner_hash = {
+            item_id: productObj.id,
+            sub_category_id: productObj.sub_category_id,
+            product_name: productObj.product_name,
+            company_name: productObj.company_name,
+            product_offer_percentage: productObj.product_offer_percentage,
+            delivery_charges: productObj.delivery_charges,
+            product_febric: productObj.product_febric,
+            color: productObj.color,
+            saree_length: productObj.saree_length,
+            blouse: productObj.blouse,
+            blouse_length: productObj.blouse_length,
+            weight: productObj.weight,
+            youtube_link: productObj.youtube_link,
+            fabric_care: productObj.fabric_care,
+            itemImageArray: [],
+            quantity: [],
+            group_id: productObj.group_id,
+            occasion: productObj.occasion
+        }
+        
+        productObj.Product_Image.forEach((imgObj) => {
+            inner_hash["itemImageArray"].push(imgObj.image_name);
+        })
+
+        productObj.Quantity.forEach((quantityObj) => {
+            const quantityHash = {
+                no_of_product: quantityObj.no_of_product,
+                size: quantityObj.size,
+                sell_price: quantityObj.sell_price
+            }
+            inner_hash["quantity"].push(quantityHash);
+        })
+        productArray.push(inner_hash);
+    })
+    // Handle the productObj as needed
+    return res.status(200).send(productArray);
+}
+
+async function getSimilarProducts(req, res){
+    // Where condition with Active status
+    let whereCluse = {
+        active_status: 1
+    }
+    let sub_category_id = req.body.sub_category_id;
+    whereCluse[Op.or] = [];
+    if(sub_category_id !=""){
+        whereCluse[Op.or].push({
+            sub_category_id:sub_category_id
+        });
+    }
+    if(req.body.color != ""){
+        req.body.color.split(", ").forEach((color) => {
+            let inner_hash = {
+                color: {
+                    [Op.like]: `%${color}%`
+                }
+            }
+            whereCluse[Op.or].push(inner_hash);
+        });
+    }
+    
+    let itemsListArray = [];
+    await ProductModel.findAll({
+        where: whereCluse,
+        attributes: ['id', 'product_name', 'product_offer_percentage', 'company_name'],
+        include: [{
+            model: productImageModel,
+            as: "Product_Image"
+        },{
+            model: quantityModel,
+            as: 'Quantity'
+          }],
+        order: [
+            ['createdAt', 'DESC'],
+            [{ model: productImageModel, as: 'Product_Image' }, 'primary', 'DESC']
+        ]  
+    })
+    .then((products) => {
+        products.forEach((product) => {
+            //console.log('User:', products);
+            let inner_hash = {
+                item_id: product.id,
+                product_offer_percentage: product.product_offer_percentage,
+                product_name: product.product_name,
+                company_name: product.company_name
+            }
+            
+            if(product.Product_Image !=undefined){
+                //console.log("product.Product_Image", product.Product_Image);
+                product.Product_Image.forEach((Product_Image, key) => {
+                    console.log("key", key);
+                    if(key == 0 || Product_Image.primary == 1){
+                        inner_hash['image_name'] = Product_Image.image_name
+                        inner_hash['primary'] = Product_Image.primary
+                    }
+                })
+            }
+
+            //console.log(inner_hash);
+
+            if(product.Quantity !=undefined){
+               // console.log("product.Quantity", product.Quantity);
+                product.Quantity.forEach((quantity) => {
+                    inner_hash['quantity'] = quantity.no_of_product
+                    inner_hash['price'] = quantity.sell_price
+                    
+                    let offerPrice = 0;
+                    if(product.product_offer_percentage > 0){
+                        offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                    }
+                    inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+                })
+            }
+
+            itemsListArray.push(inner_hash);
+        });
+    })
+    return res.status(200).send(itemsListArray);
+}
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts
 }

@@ -3,17 +3,21 @@ const router = express.Router();
 
 const bodyParser = require('body-parser');
 
-const {handalSaveAddress, handalAllUesr} = require('../controllers/userController')
+const {handalSaveAddress, handalAllUesr, saveUserRecord} = require('../controllers/userController')
 // Category Controller
-const {handalSaveCategory, handalAllCategory, handalFindCategoryById} = require('../controllers/categoryController')
+const {handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList} = require('../controllers/categoryController')
 // Sub Category Controller
 const {handalSaveSubCategory, handalAllSubCategory, handalFindSubCategoryById, handalDeleteSubCategoryById, handalFindSubCategoryByCategoryId} = require('../controllers/subCategoryController')
 // Product Fabric Controller
-const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById} = require('../controllers/productFabricController')
+const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById, fetchFabricForFontend} = require('../controllers/productFabricController')
 // Product Controller
-const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage} = require('../controllers/productController')
+const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts} = require('../controllers/productController')
 // Buy Controller
 const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList } = require('../controllers/buyController')
+
+const { getSameColorWiseItem } = require('../controllers/productImageController')
+
+const { checkDeliveryCode } = require('../controllers/deliveryController')
 
 const app = express();
 
@@ -37,11 +41,13 @@ router.use("/new_address", userRouter)*/
 router.route("/new_address").post(handalSaveAddress);
 
 router.route("/allUser").get(handalAllUesr);
+router.route("/saveUserRecord").post(saveUserRecord);
 
 // ------------------- Category -----------------
 router.route("/categoryAdd").post(handalSaveCategory);
 router.route("/AllCategory").post(handalAllCategory);
 router.route("/categoryFindId").post(handalFindCategoryById);
+router.route("/getCategoryList").post(getCategoryList);
 
 // ------------------- Sub Category -----------------
 router.route("/subCategoryAdd").post(handalSaveSubCategory);
@@ -55,6 +61,7 @@ router.route("/productFabricAdd").post(handalSaveProductFabric);
 router.route("/AllProductFabric").post(handalAllProductFabric);
 router.route("/ProductFabricFindId").post(handalFindProductFabricById);
 router.route("/deleteProductFabric").post(handalDeleteProductFabricById);
+router.route("/fetchFabric").post(fetchFabricForFontend);
 
 // ------------------- Product -----------------
 router.route("/productAdd").post(handalSaveProduct);
@@ -66,6 +73,12 @@ router.route("/deleteProductImage").post(handalDeleteProductImage);
 router.route("/productAactiveInactive").post(productAactiveInactive);
 router.route("/findProductImage").post(findProductImage);
 router.route("/setPrimaryImage").post(setPrimaryImage);
+router.route("/fetchItemTypeList").post(fetchItemTypeList)
+router.route("/getItemsList").post(getItemsList)
+router.route("/getItemsDetails").post(getItemsDetails)
+router.route("/getSimilarProducts").post(getSimilarProducts)
+// -------------------- Product Images ------------------------
+router.route("/getSameColorWiseItem").post(getSameColorWiseItem);
 
 // -------------------- Shop -----------------------
 router.route("/shopAdd").post(SaveShopDetails);
@@ -79,4 +92,7 @@ router.route("/saveBuyProduct").post(saveBuyProduct);
 router.route("/allBuyProduct").post(AllBuyProductDetails);
 router.route("/findBuyProductByPK").post(findBuyProductByPK);
 //router.route("/deleteShop").post(deleteShopById);
+
+// -------------------- Delivery -----------------------
+router.route("/checkDeliveryCode").post(checkDeliveryCode);
 module.exports = router;

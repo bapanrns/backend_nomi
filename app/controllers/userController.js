@@ -1,7 +1,9 @@
 const {db} = require('../../database/connection');
+const { Sequelize } = require("sequelize");
 
 const UserModel = require("../models/userModels");
 const addressModel = require("../models/addressModel");
+const bcrypt = require('bcrypt');
 
 
 async function handalAllUesr(req, res){
@@ -42,7 +44,36 @@ async function handalSaveAddress(req, res){
     // Send a response back to the React app
     res.send(`Hello, ${name}!`);*/
 }
+
+async function saveUserRecord(req, res){
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const newPass = await UserModel.create({
+            name: req.body.firstName+" "+req.body.lastName,
+            email: req.body.email_address,
+            phone: req.body.mobile_no,
+            whatsapp: req.body.whatsappNumber,
+            password: hashedPassword,
+            gender: req.body.gender
+        });
+        if(newPass.id > 0){
+            return res.status(200).send({succ: 1, message: "Signup Successfully."});
+        }
+    } catch (error) {
+        let errorMessage = "";
+        if (error instanceof Sequelize.UniqueConstraintError) {
+            // Handle unique constraint violation (duplicate phone number)
+            console.error('Error: Phone number already exists:', req.body.mobile_no);
+            errorMessage = "Error: Phone number already exists: "+req.body.mobile_no;
+        } else {
+            // Handle other errors
+            console.error('Error creating user:', error);
+            errorMessage = "Error creating user";
+        }
+        return res.status(200).send({succ: 0, message: errorMessage});
+    }
+}
  
 module.exports = {
-    handalSaveAddress, handalAllUesr
+    handalSaveAddress, handalAllUesr, saveUserRecord
 }

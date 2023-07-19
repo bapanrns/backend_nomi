@@ -16,14 +16,14 @@ app.use(function (req, res, next) {
 });
 
 
-//const User = require("./app/models/userModels");
+const User = require("./app/models/userModels");
 // This creates the table, dropping it first if it already existed
 //User.sync({ force: true })
 
 //const Address = require("./app/models/addressModel");
 //Address.sync({ force: true })
 const Category = require("./app/models/categoryModel");
-//Category.sync({ force: true })
+//Category.sync({ alter: true })
 
 const SubCategory = require("./app/models/subCategoryModel");
 //SubCategory.sync({ force: true })
@@ -113,6 +113,13 @@ BuyProductModal.belongsTo(ShopModal,{
     foreignKey: 'shop_id',
     as: 'Shop_Details'
 });
+
+
+const PincodeModal = require("./app/models/pincodeModel");
+//PincodeModal.sync({ force: true })
+
+const NewPincodeModal = require("./app/models/newPincodeModel");
+//NewPincodeModal.sync({ force: true })
 
 // Set up the middleware to parse incoming requests
 app.use(bodyParser.json({ limit: '50mb' }));

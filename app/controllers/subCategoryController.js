@@ -9,21 +9,45 @@ async function handalSaveSubCategory(req, res){
     //const { name } = req.body;
    // console.log(`Received name: ${name}`);
    // console.log(req.body);
-    const returnMessage = "";
-    if(req.body.id > 0){
-        // Edit
-        await SubCategoryModel.update({ category_id: req.body.category_id, sub_category_name: req.body.subCategory,  active_status: req.body.status }, {
-            where: {
-                id: req.body.id
-            }
-        });
-        
+    let returnMessage = "";
+    const sub_category_name = req.body.subCategory
+    const id = req.body.id
+     // For insert
+     let whereCluse = { 
+        where: { sub_category_name }
+    }
+    // For Update
+    if(id !== ""){
+        whereCluse = {
+            where: { sub_category_name, id: { [Op.notIn]: [id] } }
+        }
+    }
+    
+    const existingSubCat = await SubCategoryModel.findOne(whereCluse);
+    if (existingSubCat) { 
+        returnMessage = 'Sub-category already exists';
     }else{
-        // Add
-        const sub_category = await SubCategoryModel.create({ category_id: req.body.category_id, sub_category_name: req.body.subCategory,  active_status: req.body.status});
+        if(id > 0){
+            // Edit
+            const subCatObj = await SubCategoryModel.update({ category_id: req.body.category_id, sub_category_name: req.body.subCategory,  active_status: req.body.status }, {
+                where: {
+                    id: req.body.id
+                }
+            });
+            if(subCatObj.length > 0){
+                returnMessage = 'Sub-category update successfully';
+            }
+        }else{
+            // Add
+            const sub_category = await SubCategoryModel.create({ category_id: req.body.category_id, sub_category_name: req.body.subCategory,  active_status: req.body.status});
+
+            if(sub_category.id > 0){
+                returnMessage = 'Sub-category save successfully';
+            }
+        }
     }
 
-    return res.status(200).send("Save Successfully");
+    return res.status(200).send(returnMessage);
 }
 
 async function handalAllSubCategory(req, res){
