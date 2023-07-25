@@ -51,6 +51,7 @@ async function handalSaveSubCategory(req, res){
 }
 
 async function handalAllSubCategory(req, res){
+    console.log(req.headers)
     let whereCluse = {}
     if(req.body.category_id !="" && req.body.category_id != undefined){
         whereCluse['category_id'] = req.body.category_id;

@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router(); 
 
+const checkAuth = require('../helper/checkAuthMiddleware'); // Adjust the path accordingly
+const checkUserRole = require('../helper/checkUserRoleMiddleware');
+
 const bodyParser = require('body-parser');
 
-const {handalSaveAddress, handalAllUesr, saveUserRecord} = require('../controllers/userController')
+const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser} = require('../controllers/userController')
 // Category Controller
 const {handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList} = require('../controllers/categoryController')
 // Sub Category Controller
@@ -11,7 +14,7 @@ const {handalSaveSubCategory, handalAllSubCategory, handalFindSubCategoryById, h
 // Product Fabric Controller
 const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById, fetchFabricForFontend} = require('../controllers/productFabricController')
 // Product Controller
-const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts} = require('../controllers/productController')
+const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage} = require('../controllers/productController')
 // Buy Controller
 const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList } = require('../controllers/buyController')
 
@@ -42,6 +45,7 @@ router.route("/new_address").post(handalSaveAddress);
 
 router.route("/allUser").get(handalAllUesr);
 router.route("/saveUserRecord").post(saveUserRecord);
+router.route("/loginUser").post(loginUser);
 
 // ------------------- Category -----------------
 router.route("/categoryAdd").post(handalSaveCategory);
@@ -50,7 +54,7 @@ router.route("/categoryFindId").post(handalFindCategoryById);
 router.route("/getCategoryList").post(getCategoryList);
 
 // ------------------- Sub Category -----------------
-router.route("/subCategoryAdd").post(handalSaveSubCategory);
+router.route("/subCategoryAdd").post(checkAuth, checkUserRole(['adMin']), handalSaveSubCategory);
 router.route("/AllSubCategory").post(handalAllSubCategory);
 router.route("/subCategoryFindId").post(handalFindSubCategoryById);
 router.route("/deleteSubCategory").post(handalDeleteSubCategoryById);
@@ -77,6 +81,7 @@ router.route("/fetchItemTypeList").post(fetchItemTypeList)
 router.route("/getItemsList").post(getItemsList)
 router.route("/getItemsDetails").post(getItemsDetails)
 router.route("/getSimilarProducts").post(getSimilarProducts)
+router.route("/getSareeListForHomePage").post(getSareeListForHomePage)
 // -------------------- Product Images ------------------------
 router.route("/getSameColorWiseItem").post(getSameColorWiseItem);
 

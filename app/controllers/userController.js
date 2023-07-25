@@ -1,9 +1,11 @@
 const {db} = require('../../database/connection');
 const { Sequelize } = require("sequelize");
+const { Op } = require('sequelize');
 
 const UserModel = require("../models/userModels");
 const addressModel = require("../models/addressModel");
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 
 async function handalAllUesr(req, res){
@@ -73,7 +75,52 @@ async function saveUserRecord(req, res){
         return res.status(200).send({succ: 0, message: errorMessage});
     }
 }
+
+async function loginUser(req, res){
+    console.log(req.body);
+    const userName = req.body.email_address;
+    const password = req.body.password;
+    if(userName !="" && password !=""){
+        let whereCluse = {};
+        whereCluse[Op.or] = [
+            {email: userName},
+            {phone: userName}
+        ];
+
+        const userObj = await UserModel.findOne({
+            where: whereCluse
+        })
+
+        if (!userObj) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const passwordMatch = await bcrypt.compare(password, userObj.password);
+
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign({ id: userObj.id }, tGlobalSecretKey, { expiresIn: '1h' });
+        let userType = userObj.user_type;
+        if(userObj.user_type == "adMin"){
+            userType = "Admin"
+        }
+        const userInfo = {
+            user_id: userObj.id,
+            name: userObj.name,
+            email: userObj.email,
+            phone: userObj.phone,
+            whatsapp: userObj.whatsapp,
+            gender: userObj.gender,
+            user_type: userType,
+            token: token
+        }
+        res.json(userInfo);
+    }
+   // return res.status(200).send({succ: 0, message: userObj});
+}
  
 module.exports = {
-    handalSaveAddress, handalAllUesr, saveUserRecord
+    handalSaveAddress, handalAllUesr, saveUserRecord, loginUser
 }

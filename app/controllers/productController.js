@@ -1103,7 +1103,77 @@ async function getSimilarProducts(req, res){
     })
     return res.status(200).send(itemsListArray);
 }
+
+async function getSareeListForHomePage(req, res){
+    try {
+        let itemsListArray = [];
+        let itemListHash = {};
+        const groupedData = await ProductModel.findAll({
+           // group: ['Product.sub_category_id'],
+            include: [{
+                model: productImageModel,
+                as: "Product_Image"
+            },{
+                model: quantityModel,
+                as: 'Quantity'
+              }],
+            order: [
+                ['updatedAt', 'DESC'],
+                [{ model: productImageModel, as: 'Product_Image' }, 'primary', 'DESC']
+            ]  
+        }).then((products) => {
+            products.forEach((product) => {
+                console.log(product.category_id.toString() in itemListHash)
+                if (product.category_id.toString() in itemListHash) {
+                }else{
+                    itemListHash[product.category_id] = [];
+                }
+                let inner_hash = {
+                    item_id: product.id,
+                    product_offer_percentage: product.product_offer_percentage,
+                    product_name: product.product_name,
+                    company_name: product.company_name
+                }
+                
+                if(product.Product_Image !=undefined){
+                    //console.log("product.Product_Image", product.Product_Image);
+                    product.Product_Image.forEach((Product_Image, key) => {
+                        console.log("key", key);
+                        if(key == 0 || Product_Image.primary == 1){
+                            inner_hash['image_name'] = Product_Image.image_name
+                            inner_hash['primary'] = Product_Image.primary
+                        }
+                    })
+                }
+    
+                //console.log(inner_hash);
+    
+                if(product.Quantity !=undefined){
+                   // console.log("product.Quantity", product.Quantity);
+                    product.Quantity.forEach((quantity) => {
+                        inner_hash['quantity'] = quantity.no_of_product
+                        inner_hash['price'] = quantity.sell_price
+                        
+                        let offerPrice = 0;
+                        if(product.product_offer_percentage > 0){
+                            offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                        }
+                        inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+                    })
+                }
+    
+                itemListHash[product.category_id].push(inner_hash);
+                itemsListArray.push(inner_hash)
+            });
+        })
+    
+        return res.status(200).send(itemListHash);
+    } catch (error) {
+        console.error('Error retrieving grouped data:', error);
+        throw error;
+    }
+}
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage
 }

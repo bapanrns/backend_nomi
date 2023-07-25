@@ -5,6 +5,8 @@ const {db} = require('./database/connection');
 const router = require('./app/routers');
 const bodyParser = require('body-parser');
 
+const cors = require('cors');
+
 const app = express();
 
 app.use(function (req, res, next) {
@@ -14,6 +16,18 @@ app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
+
+
+// Allow requests from http://localhost:3000
+const corsOptions = {
+    origin: ['http://localhost:3000', 'http://192.168.1.5:3000', 'http://192.168.69.232:3000'],
+    methods: ['GET', 'POST'], // Add any other methods you need to support
+    allowedHeaders: ['Authorization', 'Content-Type'], // Add any other headers you want to allow
+};
+  
+app.use(cors(corsOptions));
+
+global.tGlobalSecretKey = 'nomiMart';
 
 
 const User = require("./app/models/userModels");
