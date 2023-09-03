@@ -42,6 +42,10 @@ Address.init({
     street:{
        type: DataTypes.STRING,
        allowNull: true
+    },
+    village:{
+       type: DataTypes.STRING,
+       allowNull: true
     }
 }, {
   // Other model options go here

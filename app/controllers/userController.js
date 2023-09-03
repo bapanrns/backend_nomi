@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 
 const UserModel = require("../models/userModels");
 const addressModel = require("../models/addressModel");
+const cartModel = require("../models/cartModels");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -17,34 +18,40 @@ async function handalAllUesr(req, res){
 async function handalSaveAddress(req, res){
     const { name } = req.body;
     console.log(`Received name: ${name}`);
-    console.log(req.body);
-    let date_ob = new Date();
-    let date = ("0" + date_ob.getDate()).slice(-2);
-    let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-    let year = date_ob.getFullYear();
-    let hours = date_ob.getHours();
-    let minutes = date_ob.getMinutes();
-    let seconds = date_ob.getSeconds();
-    let dateTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+    const token = req.headers.authorization;
+    const decodedToken = jwt.verify(token, tGlobalSecretKey);
 
-
-    const jane = await addressModel.create({ user_id: 1, name: req.body.name, mobile_no: req.body.phone_number, alternative_mobile_no: req.body.alternativeMobileNo, pincode: req.body.pincode, landmark: req.body.landmark, city: req.body.city });
-    console.log(jane.toJSON());
- 
-/*
-
-    const sql = "INSERT INTO address (user_id, name, mobile_no, alternative_mobile_no, pincode, landmark, city, created_at, updated_at) VALUES ?";
-    const values = [
-          [1, req.body.name, req.body.phone_number, req.body.alternativeMobileNo, req.body.pincode, req.body.landmark, req.body.cityTown, dateTime, dateTime]];
-          db.query(sql, [values], function (err, result) {
-          if (err) throw err;
-          console.log("Number of records inserted: " + req.body);
-          console.log("Number of records inserted: " + result.affectedRows);
-         // console.log(req);
-          });
-  
-    // Send a response back to the React app
-    res.send(`Hello, ${name}!`);*/
+    const user_id = decodedToken.id;
+    let saveHash = { 
+        user_id: user_id, 
+        name: req.body.name, 
+        mobile_no: req.body.mobile_no, 
+        alternative_mobile_no: req.body.alternative_mobile_no, 
+        pincode: req.body.pincode, 
+        landmark: req.body.landmark, 
+        city: req.body.city,
+        village: req.body.village  
+    }
+    let address = null;
+    let returnHash = {success: 0}
+    if(["721648", "721636"].includes(saveHash.pincode)){
+        if(req.body.id > 0){
+            address = await addressModel.update(saveHash, {
+                where: {
+                    id: req.body.id
+                }
+            });
+            if(address > 0){
+                returnHash['success']=1;
+            }
+        }else{
+            address = await addressModel.create(saveHash);
+            if(address.id > 0){
+                returnHash['success']=1;
+            }
+        }
+    }
+    return res.status(200).send(returnHash);
 }
 
 async function saveUserRecord(req, res){
@@ -106,6 +113,9 @@ async function loginUser(req, res){
         if(userObj.user_type == "adMin"){
             userType = "Admin"
         }
+
+        product_ids = await getCartDetails(userObj.id);
+
         const userInfo = {
             user_id: userObj.id,
             name: userObj.name,
@@ -114,13 +124,86 @@ async function loginUser(req, res){
             whatsapp: userObj.whatsapp,
             gender: userObj.gender,
             user_type: userType,
-            token: token
+            token: token,
+            product_ids: product_ids
         }
         res.json(userInfo);
     }
    // return res.status(200).send({succ: 0, message: userObj});
 }
+
+
+async function getCartDetails(uid){
+   let product_ids = [];
+    const cartObj = await cartModel.findAll({
+        where: {
+            user_id: uid
+        }
+    }).then((obj) => {
+        
+        product_ids = obj.map((cart) => cart.product_id+"@"+cart.size);
+    })
+    
+    return product_ids;
+    
+}
+
+async function getAddress(req, res){
+    const token = req.headers.authorization;
+    const decodedToken = jwt.verify(token, tGlobalSecretKey);
+    const user_id = decodedToken.id;
+    let addressArray = [];
+    const addressObj = await addressModel.findAll({
+        where: {user_id: user_id},
+    }).then((address) => {
+        address.forEach((obj) => {
+            let inner_hash = {}
+            inner_hash["id"] = obj.id;
+            inner_hash["name"] = obj.name;
+            inner_hash["mobile_no"] = obj.mobile_no;
+            inner_hash["alternative_mobile_no"] = obj.alternative_mobile_no;
+            inner_hash["pincode"] = obj.pincode;
+            inner_hash["landmark"] = obj.landmark;
+            inner_hash["village"] = obj.village;
+            addressArray.push(inner_hash);
+        })
+    });
+
+    return res.status(200).send(addressArray);
+}
+
+async function getAddressById(req, res){
+    let addressHash = {};
+    const addressObj = await addressModel.findOne({
+        where: {
+            id: req.body.addressId
+        }
+    }).then((obj) => {
+        addressHash["id"] = obj.id;
+        addressHash["name"] = obj.name;
+        addressHash["mobile_no"] = obj.mobile_no;
+        addressHash["alternative_mobile_no"] = obj.alternative_mobile_no;
+        addressHash["pincode"] = obj.pincode;
+        addressHash["landmark"] = obj.landmark;
+        addressHash["village"] = obj.village;
+        addressHash["city"] = obj.city;
+    })
+
+    return res.status(200).send(addressHash);
+}
+
+async function deleteAddress(req, res){
+    if(req.body.addressId !=""){
+        const address = addressModel.destroy({
+            where: {
+                id: req.body.addressId
+            }
+        })
+        console.log(address);
+    }
+    return res.status(200).send("Deleted successfully");
+}
  
 module.exports = {
-    handalSaveAddress, handalAllUesr, saveUserRecord, loginUser
+    handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress
 }

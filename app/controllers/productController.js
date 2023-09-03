@@ -791,8 +791,8 @@ async function fetchItemTypeList(req, res) {
 }
 
 async function getItemsList(req, res){
-    console.log("getItemsList");
-    console.log(req.body);
+    //console.log("getItemsList");
+    //console.log(req.body);
 
     // Where condition with Active status
     let whereCluse = {
@@ -865,8 +865,12 @@ async function getItemsList(req, res){
 
     // Type Where candition
     if(req.body.type.length > 0){
-        whereCluse['sub_category_id'] = {
-            [Op.in]: req.body.type
+        const originalArray = req.body.type;
+        const filteredArray = originalArray.filter(item => !!item);
+        if(filteredArray.length > 0){
+            whereCluse['sub_category_id'] = {
+                [Op.in]: req.body.type
+            }
         }
     }
 
@@ -911,7 +915,7 @@ async function getItemsList(req, res){
             if(product.Product_Image !=undefined){
                 //console.log("product.Product_Image", product.Product_Image);
                 product.Product_Image.forEach((Product_Image, key) => {
-                    console.log("key", key);
+                    //console.log("key", key);
                     if(key == 0 || Product_Image.primary == 1){
                         inner_hash['image_name'] = Product_Image.image_name
                         inner_hash['primary'] = Product_Image.primary
@@ -928,10 +932,14 @@ async function getItemsList(req, res){
                     inner_hash['price'] = quantity.sell_price
                     
                     let offerPrice = 0;
+                    let newPercentage = 0;
                     if(product.product_offer_percentage > 0){
-                        offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                        offerPrice = quantity.sell_price * product.product_offer_percentage/100;
+
+                        newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
                     }
                     inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+                    inner_hash['newPercentage'] = newPercentage;
                 })
             }
 
@@ -985,6 +993,7 @@ async function getItemsDetails(req, res){
     productObj.forEach((productObj) => {
         const inner_hash = {
             item_id: productObj.id,
+            category_id: productObj.category_id,
             sub_category_id: productObj.sub_category_id,
             product_name: productObj.product_name,
             company_name: productObj.company_name,
@@ -1001,21 +1010,32 @@ async function getItemsDetails(req, res){
             itemImageArray: [],
             quantity: [],
             group_id: productObj.group_id,
-            occasion: productObj.occasion
+            occasion: productObj.occasion,
+            productSize: []
         }
         
         productObj.Product_Image.forEach((imgObj) => {
             inner_hash["itemImageArray"].push(imgObj.image_name);
         })
-
+        let productSize = [];
         productObj.Quantity.forEach((quantityObj) => {
+            let offerPrice = 0;
+            let newPercentage = 0;
+            if (productObj.product_offer_percentage > 0){
+                offerPrice = quantityObj.sell_price * productObj.product_offer_percentage/100;
+                newPercentage = Math.floor((((quantityObj.sell_price + offerPrice) - quantityObj.sell_price)/(quantityObj.sell_price + offerPrice))*100);
+            }
             const quantityHash = {
                 no_of_product: quantityObj.no_of_product,
                 size: quantityObj.size,
-                sell_price: quantityObj.sell_price
+                sell_price: quantityObj.sell_price,
+                offerPrice: quantityObj.sell_price + offerPrice,
+                newPercentage: newPercentage
             }
+            productSize.push(quantityObj.size);
             inner_hash["quantity"].push(quantityHash);
         })
+        inner_hash["productSize"] = productSize;
         productArray.push(inner_hash);
     })
     // Handle the productObj as needed
@@ -1074,7 +1094,7 @@ async function getSimilarProducts(req, res){
             if(product.Product_Image !=undefined){
                 //console.log("product.Product_Image", product.Product_Image);
                 product.Product_Image.forEach((Product_Image, key) => {
-                    console.log("key", key);
+                    //console.log("key", key);
                     if(key == 0 || Product_Image.primary == 1){
                         inner_hash['image_name'] = Product_Image.image_name
                         inner_hash['primary'] = Product_Image.primary
@@ -1091,10 +1111,14 @@ async function getSimilarProducts(req, res){
                     inner_hash['price'] = quantity.sell_price
                     
                     let offerPrice = 0;
+                    let newPercentage = 0;
                     if(product.product_offer_percentage > 0){
-                        offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                        offerPrice = quantity.sell_price * product.product_offer_percentage/100;
+
+                        newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
                     }
                     inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+                    inner_hash['newPercentage'] = newPercentage;
                 })
             }
 
@@ -1116,6 +1140,12 @@ async function getSareeListForHomePage(req, res){
             },{
                 model: quantityModel,
                 as: 'Quantity'
+              },{
+                model: categoryModel,
+                as: 'Category'
+              },{
+                model: subCategoryModel,
+                as: 'SubCategory'
               }],
             order: [
                 ['updatedAt', 'DESC'],
@@ -1138,7 +1168,6 @@ async function getSareeListForHomePage(req, res){
                 if(product.Product_Image !=undefined){
                     //console.log("product.Product_Image", product.Product_Image);
                     product.Product_Image.forEach((Product_Image, key) => {
-                        console.log("key", key);
                         if(key == 0 || Product_Image.primary == 1){
                             inner_hash['image_name'] = Product_Image.image_name
                             inner_hash['primary'] = Product_Image.primary
@@ -1161,6 +1190,10 @@ async function getSareeListForHomePage(req, res){
                         inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
                     })
                 }
+
+                inner_hash['category_name'] = product.Category.category_name;
+                inner_hash['sub_category_id'] = product.SubCategory.id;
+                inner_hash['sub_category_name'] = product.SubCategory.sub_category_name;
     
                 itemListHash[product.category_id].push(inner_hash);
                 itemsListArray.push(inner_hash)

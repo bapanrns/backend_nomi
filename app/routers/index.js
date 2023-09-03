@@ -6,7 +6,7 @@ const checkUserRole = require('../helper/checkUserRoleMiddleware');
 
 const bodyParser = require('body-parser');
 
-const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser} = require('../controllers/userController')
+const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress} = require('../controllers/userController')
 // Category Controller
 const {handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList} = require('../controllers/categoryController')
 // Sub Category Controller
@@ -21,6 +21,10 @@ const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, sav
 const { getSameColorWiseItem } = require('../controllers/productImageController')
 
 const { checkDeliveryCode } = require('../controllers/deliveryController')
+
+const { getCartData, saveCartData, removeCartData, saveCartDataWhenLogin } = require('../controllers/cartController')
+
+const {continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, returnOrderItem} = require('../controllers/orderController')
 
 const app = express();
 
@@ -41,7 +45,10 @@ router.use("/users", userRouter)
 router.use("/new_address", userRouter)*/
 //router.use("/api", userRouter)
 
-router.route("/new_address").post(handalSaveAddress);
+router.route("/new_address").post(checkAuth,handalSaveAddress);
+router.route("/getAddress").post(checkAuth,getAddress);
+router.route("/getAddressById").post(checkAuth,getAddressById);
+router.route("/deleteAddress").post(checkAuth,deleteAddress);
 
 router.route("/allUser").get(handalAllUesr);
 router.route("/saveUserRecord").post(saveUserRecord);
@@ -100,4 +107,21 @@ router.route("/findBuyProductByPK").post(findBuyProductByPK);
 
 // -------------------- Delivery -----------------------
 router.route("/checkDeliveryCode").post(checkDeliveryCode);
+
+// -------------------- Cart  ---------------------------
+
+router.route("/getCartData").post(getCartData);
+router.route("/saveCartData").post(checkAuth, saveCartData);
+router.route("/removeCartData").post(checkAuth, removeCartData);
+router.route("/saveCartDataWhenLogin").post(checkAuth, saveCartDataWhenLogin);
+
+// -------------------- Order -------------------------------
+router.route("/continueToBuy").post(checkAuth, continueToBuy);
+router.route("/checkProductAvailability").post(checkProductAvailability)
+router.route("/getOrderData").post(checkAuth, getOrderData)
+router.route("/cancelOrderItem").post(checkAuth, cancelOrderItem)
+router.route("/returnOrderItem").post(checkAuth, returnOrderItem)
+
+
+
 module.exports = router;

@@ -106,6 +106,10 @@ Product.init({
     },occasion: {
         type: DataTypes.STRING(255),
         allowNull: true
+    },return_available: {
+        type: DataTypes.INTEGER(10),
+        comment: 'return_available only for 1',
+        defaultValue: 1
     }
 }, {
   // Other model options go here

@@ -34,8 +34,8 @@ const User = require("./app/models/userModels");
 // This creates the table, dropping it first if it already existed
 //User.sync({ force: true })
 
-//const Address = require("./app/models/addressModel");
-//Address.sync({ force: true })
+const Address = require("./app/models/addressModel");
+//Address.sync({ alter: true })
 const Category = require("./app/models/categoryModel");
 //Category.sync({ alter: true })
 
@@ -52,7 +52,7 @@ SubCategory.belongsTo(Category,{
 });
 
 //const productFabric = require("./app/models/productFabricModel");
-//productFabric.sync({ force: true })
+//productFabric.sync({ force: true }) 
 
 const Product = require("./app/models/productModel");
 //Product.sync({ alter: true })
@@ -134,6 +134,50 @@ const PincodeModal = require("./app/models/pincodeModel");
 
 const NewPincodeModal = require("./app/models/newPincodeModel");
 //NewPincodeModal.sync({ force: true })
+
+const CartModal = require("./app/models/cartModels");
+//CartModal.sync({ force: true })
+
+Product.hasMany(CartModal,{
+    foreignKey: 'product_id',
+    as: 'Cart'
+});
+CartModal.belongsTo(Product,{
+    foreignKey: 'product_id',
+    as: 'Product'
+});
+
+const orderModels = require("./app/models/orderModels");
+//orderModels.sync({ force: true })
+
+Address.hasMany(orderModels,{
+    foreignKey: 'delivery_address_id',
+    as: 'Order'
+});
+orderModels.belongsTo(Address,{
+    foreignKey: 'id',
+    as: 'Address'
+});
+
+const orderItemModels = require("./app/models/orderItemModels");
+//orderItemModels.sync({ force: true })
+//orderItemModels.sync({ alter: true })
+
+orderModels.hasMany(orderItemModels,{
+    foreignKey: 'order_id',
+    as: 'OrderItem'
+});
+orderItemModels.belongsTo(orderModels,{
+    foreignKey: 'id',
+    as: 'Order'
+});
+
+//CartModal.belongsTo(User, { foreignKey: 'user_id' }); // 'user_id' is the foreign key column in the Cart table
+//CartModal.belongsTo(Product, { foreignKey: 'product_id' }); // 'product_id' is the foreign key column in the Cart table
+
+
+const userAccountDetails = require("./app/models/userAccountDetails");
+userAccountDetails.sync({ force: true })
 
 // Set up the middleware to parse incoming requests
 app.use(bodyParser.json({ limit: '50mb' }));
