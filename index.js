@@ -177,7 +177,19 @@ orderItemModels.belongsTo(orderModels,{
 
 
 const userAccountDetails = require("./app/models/userAccountDetails");
-userAccountDetails.sync({ force: true })
+//userAccountDetails.sync({ force: true })
+
+const stockModel = require("./app/models/stockModel");
+//stockModel.sync({ force: true })
+/*
+Product.hasMany(stockModel,{
+    foreignKey: 'product_id',
+    as: 'Stock'
+});
+stockModel.belongsTo(Product,{
+    foreignKey: 'id',
+    as: 'Product'
+});*/
 
 // Set up the middleware to parse incoming requests
 app.use(bodyParser.json({ limit: '50mb' }));

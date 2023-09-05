@@ -10,6 +10,7 @@ const fs = require('fs');
 const uploadMiddleware = require("../helper/uploadMiddleware");
 const productImageModel = require("../models/productImageModel");
 const groupModal = require("../models/groupModal");
+const stockModel = require("../models/stockModel");
  
 
 
@@ -353,7 +354,7 @@ async function updateProductQuantity(id, updateHash){
     });
 }
 
-async function handalAllProduct(req, res){
+async function handalAllProduct_old(req, res){
     let whereCluse = {}
     if(req.body.category_id !=""){
         whereCluse['category_id'] = req.body.category_id;
@@ -428,6 +429,7 @@ async function handalAllProduct(req, res){
                     }
                 });
 
+
                 inner_hash['category_id'] = product.Category.category_name;
                 inner_hash['sub_category_id'] = product.SubCategory.sub_category_name;
                 inner_hash['no_of_product'] = quantityArray.reduce((sum, current) => sum + current, 0);
@@ -443,6 +445,123 @@ async function handalAllProduct(req, res){
        // console.log("=======================");
        //console.log(productArray);
     return res.status(200).send(productArray);
+}
+
+async function handalAllProduct(req, res) {
+    try {
+        const whereClause = {};
+  
+        if (req.body.category_id !== "") {
+            whereClause['category_id'] = req.body.category_id;
+        }
+  
+        if (req.body.sub_category_id !== "") {
+            whereClause['sub_category_id'] = req.body.sub_category_id;
+        }
+  
+        if (req.body.active_status !== "") {
+            whereClause['active_status'] = req.body.active_status;
+        }
+  
+        const productArray = [];
+  
+        const products = await ProductModel.findAll({
+            where: whereClause,
+            include: [
+                {
+                    model: quantityModel,
+                    as: 'Quantity',
+                },
+                {
+                    model: categoryModel,
+                    as: 'Category',
+                },
+                {
+                    model: subCategoryModel,
+                    as: 'SubCategory',
+                },
+                ],
+        });
+  
+        for (const product of products) {
+            const {
+                id,
+                group_id,
+                color,
+                sub_category_id,
+                active_status,
+                Category: { category_name },
+                SubCategory: { sub_category_name },
+            } = product;
+  
+            const quantityArray = [];
+  
+            for (const quantity of product.Quantity) {
+                quantityArray.push(quantity.no_of_product);
+            }
+  
+            // Assuming getStock() is an asynchronous function
+            const stockCount = await getStock(product.id);
+  
+            const innerProduct = {
+                id,
+                category_id: category_name,
+                group_id,
+                color,
+                sub_category_id: sub_category_name,
+                no_of_product: quantityArray.reduce((sum, current) => sum + current, 0),
+                quantity_xs: "",
+                quantity_s: "",
+                quantity_l: "",
+                quantity_m: "",
+                quantity_xl: "",
+                quantity_2xl: "",
+                stock: stockCount,
+            };
+  
+            for (const quantity of product.Quantity) {
+                const quantity_price = `${quantity.no_of_product} => ${quantity.buy_price} => ${quantity.sell_price}`;
+  
+                switch (quantity.size) {
+                    case "XS":
+                        innerProduct.quantity_xs = quantity_price;
+                        break;
+                    case "S":
+                        innerProduct.quantity_s = quantity_price;
+                        break;
+                    case "L":
+                        innerProduct.quantity_l = quantity_price;
+                        break;
+                    case "M":
+                        innerProduct.quantity_m = quantity_price;
+                        break;
+                    case "XL":
+                        innerProduct.quantity_xl = quantity_price;
+                        break;
+                    case "2XL":
+                        innerProduct.quantity_2xl = quantity_price;
+                        break;
+                    default:
+                        innerProduct.quantity = quantity_price;
+                }
+            }
+            productArray.push(innerProduct);
+        }
+        return res.status(200).json(productArray);
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+  
+async function getStock(product_id){
+    const stockObj = await stockModel.findAll({
+        where: {
+            product_id: product_id,
+            status: "Pending"
+        },
+    })
+    return stockObj.length;
 }
 
 async function handalFindProductById(req, res){
@@ -724,7 +843,7 @@ async function productAactiveInactive(req, res){
 }
 
 async function findProductImage(req, res){
-    console.log("req.body.product_id", req.body.product_id);
+    //console.log("req.body.product_id", req.body.product_id);
     const productImageObj = await productImageModel.findAll({
         where: {
             product_id: req.body.product_id
@@ -1074,7 +1193,12 @@ async function getSimilarProducts(req, res){
             as: "Product_Image"
         },{
             model: quantityModel,
-            as: 'Quantity'
+            as: 'Quantity',
+            where: {
+                no_of_product: {
+                    [Op.gt]: 0,
+                }
+            }
           }],
         order: [
             ['createdAt', 'DESC'],
@@ -1139,7 +1263,13 @@ async function getSareeListForHomePage(req, res){
                 as: "Product_Image"
             },{
                 model: quantityModel,
-                as: 'Quantity'
+                as: 'Quantity',
+                /*where: {
+                    no_of_product: {
+                        [Op.gt]: 0,
+                    }
+                }*/
+                order: [['no_of_product', 'DESC']]
               },{
                 model: categoryModel,
                 as: 'Category'
@@ -1206,7 +1336,253 @@ async function getSareeListForHomePage(req, res){
         throw error;
     }
 }
+
+async function allProductStock(req, res){
+    let stockArray = [];
+    const stockObj = await stockModel.findAll({
+        where: {
+            product_id: req.body.product_id
+        }, 
+        order: [['status', 'DESC'],['createdAt', 'DESC']]
+    }).then((stock) => {
+        stock.forEach((obj) => {
+            let inner_hash = {
+                id: obj.id,
+                product_id: obj.product_id,
+                no_of_product: obj.no_of_product,
+                buy_price: obj.buy_price,
+                sell_price: obj.sell_price,
+                size: obj.size,
+                status: obj.status
+            }
+
+            stockArray.push(inner_hash);
+        })
+    })
+    return res.status(200).send(stockArray);
+}
+
+async function saveProductStock(req, res){
+    const quantityArray = [];
+    if (req.body.quantity > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id,
+                no_of_product: req.body.quantity,
+                size: "",
+                buy_price: req.body.quantity_buy_price,
+                sell_price: req.body.quantity_selling_price
+            }
+        )
+    }
+    if (req.body.quantityXs > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id,
+                no_of_product: req.body.quantityXs,
+                size: "XS",
+                buy_price: req.body.quantityXs_buy_price,
+                sell_price: req.body.quantityXs_selling_price
+            }
+        )
+    }
+    if (req.body.quantityS > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id,
+                no_of_product: req.body.quantityS,
+                size: "S",
+                buy_price: req.body.quantityS_buy_price,
+                sell_price: req.body.quantityS_selling_price
+            }
+        )
+    }
+    if (req.body.quantityL > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id,
+                no_of_product: req.body.quantityL,
+                size: "L",
+                buy_price: req.body.quantityL_buy_price,
+                sell_price: req.body.quantityL_selling_price
+            }
+        )
+    }
+    if (req.body.quantityM > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id,
+                no_of_product: req.body.quantityM,
+                size: "M",
+                buy_price: req.body.quantityM_buy_price,
+                sell_price: req.body.quantityM_selling_price
+            }
+        )
+    }
+    if (req.body.quantityXl > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id,
+                no_of_product: req.body.quantityXl,
+                size: "XL",
+                buy_price: req.body.quantityXl_buy_price,
+                sell_price: req.body.quantityXl_selling_price
+            }
+        )
+    }
+
+    if (req.body.quantity2Xl > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id,
+                no_of_product: req.body.quantity2Xl,
+                size: "2XL",
+                buy_price: req.body.quantity2Xl_buy_price,
+                sell_price: req.body.quantity2Xl_selling_price
+            }
+        )
+    }
+
+    //console.log(quantityArray);
+    const stockObj = await stockModel.bulkCreate(quantityArray);
+    let returnMessage =  "Insert Successfully";
+    if(stockObj.length == 0){
+        returnMessage = "Error"
+    }
+
+    return res.status(200).send(returnMessage);
+}
+
+async function updateQuentity1(req, res){
+    stockModel.findOne({
+        where: {
+            id: req.body.id
+        },
+    })
+    .then(stockObj => {
+        const qObj = User.quantityModel({ where: { product_id: req.body.product_id, size: req.body.size } })
+
+        if(!qObj){
+            const quantity = quantityModel.create(
+                {no_of_product: req.body.no_of_product}
+            );
+        }else{
+            quantityModel.update({no_of_product: no_of_product}, {
+                where: {
+                    id: id
+                }
+            });    
+        }
+    })
+}
+
+
+async function updateQuantity(req, res) {
+    try {
+        // Find the stock item
+        const stockObj = await stockModel.findOne({
+            where: {
+                id: req.body.id,
+                status: "Pending"
+            },
+        });
+
+        if (!stockObj) {
+            return res.status(200).json({ message: 'Stock item not found' });
+        }
+  
+      // Try to find the existing quantityModel record
+        const qObj = await quantityModel.findOne({
+            where: {
+                product_id: stockObj.product_id,
+                size: stockObj.size,
+            },
+        });
+
+        let quantityHash = {
+            product_id: stockObj.product_id,
+            no_of_product: stockObj.no_of_product,
+            size: stockObj.size,
+            buy_price: stockObj.buy_price,
+            sell_price: stockObj.sell_price
+        }
+
+        if (!qObj) {
+            // If the quantityModel record does not exist, create a new one
+            const inserQuantity = await quantityModel.create(quantityHash);
+            if(inserQuantity.dataValues.id > 0){
+                await updateStockStatus(req.body.id)
+            }
+        } else {
+            //console.log("----", qObj.dataValues.no_of_product)
+            quantityHash["no_of_product"] = quantityHash["no_of_product"] + qObj.dataValues.no_of_product;
+        // If the quantityModel record exists, update it
+            const updateQuantity = await quantityModel.update(
+                quantityHash,
+                {
+                    where: {
+                        product_id: stockObj.product_id,
+                        size: stockObj.size,
+                    },
+                }
+            );
+
+            if(updateQuantity.length > 0){
+                await updateStockStatus(req.body.id)
+            }
+        }
+  
+        // Send a success response
+        return res.status(200).json({ message: 'Quantity updated successfully' });
+    } catch (error) {
+        // Handle any errors that occur during the database operations
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+async function updateStockStatus(id){
+    const updateQuantity = await stockModel.update(
+        {status: "Complete"},
+        {
+            where: {
+                id: id
+            },
+        }
+    );
+}
+
+
+async function deleteProductStock(req, res) {
+    try {
+      const deletedOrdersCount = await stockModel.destroy({
+        where: {
+          id: req.body.id,
+        },
+      });
+  
+      if (deletedOrdersCount === 0) {
+        return res.status(404).json({ message: 'Record not found' });
+      }
+  
+      return res.status(200).json({ message: 'Record deleted successfully' });
+    } catch (error) {
+      // Handle any errors that occur during the database operations
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+  
+  
+  
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock
 }

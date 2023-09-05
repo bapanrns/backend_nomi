@@ -177,7 +177,7 @@ async function removeCartData(req, res){
     try {
         const token = req.headers.authorization;
         const decodedToken = jwt.verify(token, tGlobalSecretKey);
-        const deletedCart = await cartModel.destroy({
+        const deletedCart = await cartModel.roy({
             where: { 
                 user_id: decodedToken.id,
                 product_id: req.body.itemIds

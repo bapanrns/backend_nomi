@@ -14,7 +14,7 @@ const {handalSaveSubCategory, handalAllSubCategory, handalFindSubCategoryById, h
 // Product Fabric Controller
 const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById, fetchFabricForFontend} = require('../controllers/productFabricController')
 // Product Controller
-const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage} = require('../controllers/productController')
+const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock} = require('../controllers/productController')
 // Buy Controller
 const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList } = require('../controllers/buyController')
 
@@ -24,7 +24,7 @@ const { checkDeliveryCode } = require('../controllers/deliveryController')
 
 const { getCartData, saveCartData, removeCartData, saveCartDataWhenLogin } = require('../controllers/cartController')
 
-const {continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, returnOrderItem} = require('../controllers/orderController')
+const {continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, returnOrderItem, allOrderDetails} = require('../controllers/orderController')
 
 const app = express();
 
@@ -89,6 +89,10 @@ router.route("/getItemsList").post(getItemsList)
 router.route("/getItemsDetails").post(getItemsDetails)
 router.route("/getSimilarProducts").post(getSimilarProducts)
 router.route("/getSareeListForHomePage").post(getSareeListForHomePage)
+router.route("/allProductStock").post(checkAuth, checkUserRole(['adMin']),allProductStock)
+router.route("/saveProductStock").post(checkAuth, checkUserRole(['adMin']),saveProductStock)
+router.route("/updateQuantity").post(checkAuth, checkUserRole(['adMin']),updateQuantity)
+router.route("/deleteProductStock").post(checkAuth, checkUserRole(['adMin']),deleteProductStock)
 // -------------------- Product Images ------------------------
 router.route("/getSameColorWiseItem").post(getSameColorWiseItem);
 
@@ -121,6 +125,7 @@ router.route("/checkProductAvailability").post(checkProductAvailability)
 router.route("/getOrderData").post(checkAuth, getOrderData)
 router.route("/cancelOrderItem").post(checkAuth, cancelOrderItem)
 router.route("/returnOrderItem").post(checkAuth, returnOrderItem)
+router.route("/allOrderDetails").post(checkAuth, checkUserRole(['adMin']), allOrderDetails)
 
 
 

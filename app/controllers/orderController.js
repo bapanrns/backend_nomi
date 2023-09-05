@@ -200,7 +200,7 @@ async function deleteCardRecord(user_id, product_id, size){
         whereClase["size"] = size;
     }
 
-    const deletedOrdersCount = await Cart.destroy({
+    const deletedOrdersCount = await Cart.roy({
         where: whereClase,
     });
 
@@ -522,6 +522,32 @@ async function getDeliveryAddress(delivery_address_id){
     return addressArray;
 }
 
+
+async function allOrderDetails(req, res){
+    let orderArray = [];
+    OrderModels.findAll({
+        include: [
+            {
+                model: OrderItemModels,
+                as: 'OrderItem',
+                where: {
+                    order_status: 'Pending'
+                },
+                attributes: ['price'],
+            },
+        ],
+    }).then((order) => {
+        
+    })
+    .catch((error) => {
+          // Handle errors
+    });
+      
+    console.log(orderArray);
+        
+    return res.status(200).send([{delivery_pincode: 5, total_amount: 5000, id: 5}]);
+}
+
 module.exports = {
-    continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, productAvailability, returnOrderItem
+    continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, productAvailability, returnOrderItem, allOrderDetails
 }
