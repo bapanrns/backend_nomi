@@ -11,6 +11,8 @@ const uploadMiddleware = require("../helper/uploadMiddleware");
 const productImageModel = require("../models/productImageModel");
 const groupModal = require("../models/groupModal");
 const stockModel = require("../models/stockModel");
+
+const Nodelogger = require("../loger/winstonlogger")
  
 
 
@@ -912,6 +914,7 @@ async function fetchItemTypeList(req, res) {
 async function getItemsList(req, res){
     //console.log("getItemsList");
     //console.log(req.body);
+    Nodelogger.info(req.body);
 
     // Where condition with Active status
     let whereCluse = {

@@ -9,6 +9,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 
+//const { transporter } = require('../mailers/user_mailer');
+const { transporter } = require('../mailers/user_mailer');
+
 async function handalAllUesr(req, res){
    let result = 
     await UserModel.findAll();
@@ -66,6 +69,25 @@ async function saveUserRecord(req, res){
             gender: req.body.gender
         });
         if(newPass.id > 0){
+
+            var mailOptions = {
+                from: 'bapan.rns@gmail.com',
+                to: `roymrinmoy2000@gmail.com`,
+                // to: 'roymrinmoy2000@gmail.com',
+                subject: 'Welcome to our system',
+                html: '<p>Hi </p><p>You are successfully registered in our system.</p>'
+              };
+      
+              transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+              });
+
+
+
             return res.status(200).send({succ: 1, message: "Signup Successfully."});
         }
     } catch (error) {
@@ -203,7 +225,106 @@ async function deleteAddress(req, res){
     }
     return res.status(200).send("Deleted successfully");
 }
+
+function generateOTP() {
+    const otp = Math.floor(1000 + Math.random() * 9000); // Generate a 4-digit random number
+    return otp.toString();
+}
+
+async function forgotPassword(req, res){
+    let returnMessage = {messageStatus: 1, message: ""};
+    let newOtp = "";
+    await UserModel.findOne({
+        where: { email: req.body.email },
+    })
+    .then(user => {
+        if (user) {
+            newOtp = generateOTP();
+            user.last_otp = newOtp; // Update the firstName
+            return user.save(); // Save the changes to the database
+        } else {
+            returnMessage["message"] = 'Email address not found';
+            returnMessage["messageStatus"] = 1;
+        }
+    })
+    .then(updatedUser => {
+        if (updatedUser) {
+            var mailOptions = {
+                from: 'bapan.rns@gmail.com',
+                to: req.body.email,
+                // to: 'roymrinmoy2000@gmail.com',
+                subject: 'NomiMart.in New OTP',
+                html: `Your OTP code is: ${newOtp}`
+            };
+      
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
+
+            returnMessage["message"] = 'An OTP has been sent to your email address successfully.';
+            returnMessage["messageStatus"] = 0;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+    return res.status(200).send(returnMessage);
+}
+
+async function setNewPassword(req, res){
+    let returnMessage = {messageStatus: 0, message: ""};
+    let newOtp = "";
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    await UserModel.findOne({
+        where: { email: req.body.email },
+    })
+    .then(user => {
+        if (user) {
+            if(user.last_otp == req.body.otp && user.last_otp != null){
+                user.password = hashedPassword; // Update the firstName
+                user.last_otp = null;
+                return user.save(); // Save the changes to the database
+            }else{
+                returnMessage["message"] = 'Incorrect OTP, please try again.';
+                returnMessage["messageStatus"] = 1;
+            }
+        } else {
+            returnMessage["message"] = 'Email address not found';
+            returnMessage["messageStatus"] = 0;
+        }
+    })
+    .then(updatedUser => {
+        if (updatedUser) {
+            var mailOptions = {
+                from: 'bapan.rns@gmail.com',
+                to: req.body.email,
+                // to: 'roymrinmoy2000@gmail.com',
+                subject: 'NomiMart.in Password Change',
+                html: `Password changed successfully`
+            };
+      
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
+
+            returnMessage["message"] = 'Password change successfully.';
+            returnMessage["messageStatus"] = 0;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+    return res.status(200).send(returnMessage);
+}
  
 module.exports = {
-    handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress
+    handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress, forgotPassword, setNewPassword
 }

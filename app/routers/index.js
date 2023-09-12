@@ -6,7 +6,7 @@ const checkUserRole = require('../helper/checkUserRoleMiddleware');
 
 const bodyParser = require('body-parser');
 
-const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress} = require('../controllers/userController')
+const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress, forgotPassword, setNewPassword} = require('../controllers/userController')
 // Category Controller
 const {handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList} = require('../controllers/categoryController')
 // Sub Category Controller
@@ -53,6 +53,8 @@ router.route("/deleteAddress").post(checkAuth,deleteAddress);
 router.route("/allUser").get(handalAllUesr);
 router.route("/saveUserRecord").post(saveUserRecord);
 router.route("/loginUser").post(loginUser);
+router.route("/forgotPassword").post(forgotPassword);
+router.route("/setNewPassword").post(setNewPassword);
 
 // ------------------- Category -----------------
 router.route("/categoryAdd").post(handalSaveCategory);
@@ -125,7 +127,7 @@ router.route("/checkProductAvailability").post(checkProductAvailability)
 router.route("/getOrderData").post(checkAuth, getOrderData)
 router.route("/cancelOrderItem").post(checkAuth, cancelOrderItem)
 router.route("/returnOrderItem").post(checkAuth, returnOrderItem)
-router.route("/allOrderDetails").post(checkAuth, checkUserRole(['adMin']), allOrderDetails)
+router.route("/allOrderDetails").post( allOrderDetails)
 
 
 

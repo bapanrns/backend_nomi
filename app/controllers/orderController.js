@@ -1,4 +1,4 @@
-const {db} = require('../../database/connection');
+const sequelize = require('../../database/connection');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 
@@ -200,7 +200,7 @@ async function deleteCardRecord(user_id, product_id, size){
         whereClase["size"] = size;
     }
 
-    const deletedOrdersCount = await Cart.roy({
+    const deletedOrdersCount = await Cart.destroy({
         where: whereClase,
     });
 
@@ -523,7 +523,7 @@ async function getDeliveryAddress(delivery_address_id){
 }
 
 
-async function allOrderDetails(req, res){
+async function allOrderDetails1(req, res){
     let orderArray = [];
     OrderModels.findAll({
         include: [
@@ -546,6 +546,72 @@ async function allOrderDetails(req, res){
     console.log(orderArray);
         
     return res.status(200).send([{delivery_pincode: 5, total_amount: 5000, id: 5}]);
+}
+
+
+async function allOrderDetails(req, res) {
+    try {
+      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id, oi.order_status 
+        FROM orders o,
+        products p, 
+        order_items oi 
+        WHERE oi.product_id = p.id 
+        AND o.id = oi.order_id 
+        AND oi.order_status = 'Pending'`);
+  
+        // Handle the results here
+        const orderIDs = results[0].map(result => result['pId']);
+        console.log(orderIDs);
+        const imageHash = await getProductImage(orderIDs);
+
+        console.log(imageHash);
+
+        const orderArray = [];
+
+        results[0].forEach((resultObj, key) => {
+            console.log(resultObj);
+            let innerHash = {};
+            innerHash["orderId"] = resultObj.orderId;
+            innerHash["pId"] = resultObj.pId;
+            innerHash["product_name"] = resultObj.product_name;
+            innerHash["product_image"] = imageHash[resultObj.pId];
+            innerHash["quantity"] = resultObj.quantity;
+            innerHash["price"] = resultObj.price;
+            innerHash["size"] = resultObj.size;
+            innerHash["is_open_delivery"] = resultObj.is_open_delivery;
+            orderArray.push(innerHash);
+        })
+
+      
+      return res.status(200).send(orderArray);
+    } catch (error) {
+      // Handle any errors here
+      console.error(error);
+      return res.status(500).send('Error executing the query.');
+    }
+    //console.log(sequelize);
+}
+
+async function getProductImage(pIds){
+    const productIds = [...new Set(pIds)];
+    let imageHass = {};
+
+    const products = await productImageModel.findAll({
+        where: {
+            product_id:{
+                [Op.in]: productIds,
+            }
+        },
+        attributes: ['image_name', 'product_id', 'primary']
+    }).then(productImgObj => {
+        productImgObj.forEach((ImgObj, key) => {
+            if(key == 0 || ImgObj['primary'] == 1){
+                imageHass[ImgObj.product_id] = ImgObj.image_name;
+            }
+        })
+    })
+
+    return imageHass;
 }
 
 module.exports = {
