@@ -55,7 +55,7 @@ SubCategory.belongsTo(Category,{
 //productFabric.sync({ force: true }) 
 
 const Product = require("./app/models/productModel");
-//Product.sync({ alter: true })
+Product.sync({ alter: true })
 
 const Quantity = require("./app/models/quantityModel");
 //Quantity.sync({ force: true })
@@ -200,6 +200,6 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/api", router)
 
-app.listen(8081, () => {
-    console.log('Server started on port 8081');
+app.listen(3000, () => {
+    console.log('Server started on port 3000');
   });

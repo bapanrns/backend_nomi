@@ -9,6 +9,9 @@ const cartModel = require("../models/cartModels");
 const orderController = require('./orderController');
 
 async function getCartData(req, res){
+    const token = req.headers.authorization;
+    const decodedToken = jwt.verify(token, tGlobalSecretKey);
+
     let itemIds = JSON.parse(req.body.itemIds)
     //console.log(itemIds);
     try {
@@ -36,7 +39,6 @@ async function getCartData(req, res){
         //let itemsListArray = [];
         let itemListHash = {};
         let totalPrice = []
-        console.log("========================================");
         const groupedData = await ProductModel.findAll({
             where: {},
             include: [{
@@ -50,7 +52,9 @@ async function getCartData(req, res){
               },{
                 model: cartModel,
                 as: 'Cart',
-                where: {}
+                where: {
+                   user_id: decodedToken.id
+                }
               }],
             order: [
                 ['updatedAt', 'DESC'],
@@ -177,7 +181,7 @@ async function removeCartData(req, res){
     try {
         const token = req.headers.authorization;
         const decodedToken = jwt.verify(token, tGlobalSecretKey);
-        const deletedCart = await cartModel.roy({
+        const deletedCart = await cartModel.destroy({
             where: { 
                 user_id: decodedToken.id,
                 product_id: req.body.itemIds

@@ -1,4 +1,5 @@
-const {db} = require('../../database/connection');
+//const {db} = require('../../database/connection');
+const sequelize = require('../../database/connection');
 const { Op } = require('sequelize');
 
 const ProductModel = require("../models/productModel");
@@ -31,6 +32,7 @@ async function handalSaveProduct(req, res){
         bill_id = bill_id_and_shop_id.split("@")[0];
         shop_id = bill_id_and_shop_id.split("@")[1];
     }
+    
     const saveHash = {
                     category_id: req.body.category_id, 
                     sub_category_id: req.body.sub_category_id,  
@@ -43,6 +45,7 @@ async function handalSaveProduct(req, res){
                     product_febric_id: req.body.product_febric_id, 
                     product_febric: req.body.product_febric, 
                     color: req.body.color.join(', '),
+                    occasion: req.body.occasion.join(', '),
                     saree_length: req.body.saree_length,
                     blouse: req.body.blouse,
                     blouse_length: req.body.blouse_length,
@@ -50,7 +53,8 @@ async function handalSaveProduct(req, res){
                     youtube_link: req.body.youtube_link,
                     fabric_care: req.body.fabric_care,
                     bill_id: bill_id,
-                    shop_id: shop_id
+                    shop_id: shop_id,
+                    return_avaliable: req.body.return_avaliable
                 }
     if(req.body.id > 0){
         // Edit
@@ -315,7 +319,8 @@ async function handalSaveProduct(req, res){
         for (let i = 0; i < imageArray.length; i++) {
             base64Image = imageArray[i];
             const decodedImage = uploadMiddleware.decodeBase64Image(base64Image.img);
-            const imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/product/'+decodedImage.name);
+            // /Bapan/React/frontend_nomi/src/images/product
+            const imagePath = path.resolve('/home/nomimart/public_html/images/product/'+decodedImage.name);
             // ********************* Save product Images **************************************
             const productImage = await productImageModel.create({
                     product_id: productId,
@@ -482,7 +487,11 @@ async function handalAllProduct(req, res) {
                     model: subCategoryModel,
                     as: 'SubCategory',
                 },
-                ],
+                {
+                    model: productImageModel,
+                    as: 'Product_Image',
+                }
+            ],
         });
   
         for (const product of products) {
@@ -510,7 +519,8 @@ async function handalAllProduct(req, res) {
                 category_id: category_name,
                 group_id,
                 color,
-                sub_category_id: sub_category_name,
+                sub_category_id: sub_category_id,
+                sub_category_desc: sub_category_name,
                 no_of_product: quantityArray.reduce((sum, current) => sum + current, 0),
                 quantity_xs: "",
                 quantity_s: "",
@@ -519,7 +529,18 @@ async function handalAllProduct(req, res) {
                 quantity_xl: "",
                 quantity_2xl: "",
                 stock: stockCount,
+                active_status,
             };
+
+            if(product.Product_Image !=undefined){
+                let count = 0;
+                for (const imgObj of product.Product_Image) {
+                    if(count == 0 || imgObj.primary == 1){
+                        innerProduct["product_img"] = imgObj.image_name;
+                    }
+                    count++;
+                }
+            }
   
             for (const quantity of product.Quantity) {
                 const quantity_price = `${quantity.no_of_product} => ${quantity.buy_price} => ${quantity.sell_price}`;
@@ -578,6 +599,7 @@ async function handalFindProductById(req, res){
         year_month: "",
         product_offer_percentage: "",
         delivery_charges: "",
+        return_avaliable: "",
         quantity: "",
         quantity_id: "",
         quantity_buy_price: "",
@@ -609,6 +631,7 @@ async function handalFindProductById(req, res){
         product_febric_id: "",
         product_febric: "",
         color: [],
+        occassion: [],
         imageArray: [],
         images1: "",
         images2: "",
@@ -652,6 +675,11 @@ async function handalFindProductById(req, res){
             //console.log(products)
             products.forEach((product) => {
            // console.log('User:', products);
+            let occasion = [];
+            if(product.occasion != null){
+                occasion = product.occasion.split(', ');
+            }
+
                 productHash['category_id'] = product.category_id;
                 productHash['sub_category_id'] = product.sub_category_id;
                 productHash['product_name'] = product.product_name;
@@ -662,12 +690,14 @@ async function handalFindProductById(req, res){
                 productHash['product_febric'] = product.product_febric;
                 productHash['product_febric_id'] = product.product_febric_id;
                 productHash['color'] = product.color.split(", ");
+                productHash['occasion'] = occasion;
                 productHash['saree_length'] = product.saree_length;
                 productHash['blouse'] = product.blouse;
                 productHash['blouse_length'] = product.blouse_length;
                 productHash['weight'] = product.weight;
                 productHash['youtube_link'] = product.youtube_link;
                 productHash['delivery_charges'] = product.delivery_charges;
+                productHash['return_avaliable'] = product.return_avaliable;
                 productHash['fabric_care'] = product.fabric_care;
                 productHash['bill_id_and_shop_id'] = product.bill_id+"@"+product.shop_id;
 
@@ -742,7 +772,44 @@ async function handalDeleteProductById(req, res){
     return res.status(200).send("Deleted Successfully");
 }
 
-async function handalUpdateGroupId(req, res){
+async function handalUpdateGroupId(req, res) {
+    const product_id = req.body.product_id;
+    const group_id = req.body.group_id;
+    const sub_category_id = req.body.sub_category_id;
+  
+    try {
+      // Find the product based on the provided group_id
+      const product = await ProductModel.findOne({
+        where: {
+          group_id: group_id,
+        },
+        attributes: ['sub_category_id'],
+      });
+  
+      if (!product) {
+        return res.status(404).send({ message: "Product not found", msgFlag: "error" });
+      }
+  
+      if (product.sub_category_id === sub_category_id) {
+        // Update the product's group_id
+        await ProductModel.update({ group_id: group_id }, {
+          where: {
+            id: product_id,
+          }
+        });
+  
+        return res.status(200).send({ message: "Update Successfully", msgFlag: "success" });
+      } else {
+        return res.status(200).send({ message: "Sub-category mismatch", msgFlag: "error" });
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      return res.status(500).send({ message: "Internal Server Error", msgFlag: "error" });
+    }
+}
+  
+
+async function handalCreateGroupID(req, res){
     const product_ids = req.body.product_id;
     let errorMessage = "Please select the same subcategory";
     const uniqeSubCategoryIdsLength = await findProductSubCategory(product_ids);
@@ -806,7 +873,8 @@ async function handalDeleteProductImage(req, res){
                 if (images === 1) {
                     console.log('Image deleted successfully.');
                     errorMessage = "Image deleted successfully.";
-                    const imagePath = '/Bapan/React/frontend_nomi/src/images/product/'+req.body.image;
+                    // /Bapan/React/frontend_nomi/src/images/product
+                    const imagePath = '/home/nomimart/public_html/images/product/'+req.body.image;
                     fs.unlink(imagePath, (err) => {
                         if (err) {
                         console.error('Error deleting the image:', err);
@@ -962,7 +1030,11 @@ async function getItemsList(req, res){
     let quantityTableWhereCon = {
         model: quantityModel,
         as: 'Quantity',
-        where: {}
+        where: {
+            no_of_product: {
+                [Op.gt]: 0,
+            }
+        }
     }
     if(req.body.price.length > 0){
         
@@ -1016,10 +1088,11 @@ async function getItemsList(req, res){
         where: whereCluse,
         attributes: ['id', 'product_name', 'product_offer_percentage', 'company_name'],
         include: whereInclude,
-        order: [
+       /* order: [
             ['createdAt', 'DESC'],
             [{ model: productImageModel, as: 'Product_Image' }, 'primary', 'DESC']
-        ]  
+        ]  */
+        order: sequelize.literal('RAND()')
     })
     .then((products) => {
         //console.log(products);
@@ -1133,7 +1206,8 @@ async function getItemsDetails(req, res){
             quantity: [],
             group_id: productObj.group_id,
             occasion: productObj.occasion,
-            productSize: []
+            productSize: [],
+            return_avaliable: productObj.return_avaliable
         }
         
         productObj.Product_Image.forEach((imgObj) => {
@@ -1259,20 +1333,134 @@ async function getSareeListForHomePage(req, res){
     try {
         let itemsListArray = [];
         let itemListHash = {};
+
+
+        const categories = await ProductModel.findAll({
+            attributes: ['category_id'],
+            group: ['category_id'],
+        });
+
+        for (const category of categories) {
+            const categoryId = category.getDataValue('category_id');
+
+            const groupedData = await ProductModel.findAll({
+            // group: ['Product.sub_category_id'],
+                where:{
+                    active_status: 1,
+                    category_id: categoryId
+                },
+                include: [{
+                    model: productImageModel,
+                    as: "Product_Image"
+                },{
+                    model: quantityModel,
+                    as: 'Quantity',
+                    where: {
+                        no_of_product: {
+                            [Op.gt]: 0,
+                        }
+                    }/*,
+                    order: [['no_of_product', 'DESC']]*/
+                },{
+                    model: categoryModel,
+                    as: 'Category'
+                },{
+                    model: subCategoryModel,
+                    as: 'SubCategory'
+                }],
+                /*order: [
+                    ['updatedAt', 'DESC'],
+                    [{ model: productImageModel, as: 'Product_Image' }, 'primary', 'DESC']
+                ]  */
+                group: ['group_id'],
+                order: sequelize.literal('RAND()'),
+                limit: 15,
+                
+            }).then((products) => {
+                products.forEach((product) => {
+                    console.log(product.category_id.toString() in itemListHash)
+                    if (product.category_id.toString() in itemListHash) {
+                    }else{
+                        itemListHash[product.category_id] = [];
+                    }
+                    let inner_hash = {
+                        item_id: product.id,
+                        product_offer_percentage: product.product_offer_percentage,
+                        product_name: product.product_name,
+                        company_name: product.company_name
+                    }
+                    
+                    if(product.Product_Image !=undefined){
+                        //console.log("product.Product_Image", product.Product_Image);
+                        product.Product_Image.forEach((Product_Image, key) => {
+                            if(key == 0 || Product_Image.primary == 1){
+                                inner_hash['image_name'] = Product_Image.image_name
+                                inner_hash['primary'] = Product_Image.primary
+                            }
+                        })
+                    }
+        
+                    //console.log(inner_hash);
+        
+                    if(product.Quantity !=undefined){
+                    // console.log("product.Quantity", product.Quantity);
+                        product.Quantity.forEach((quantity) => {
+                            inner_hash['quantity'] = quantity.no_of_product
+                            inner_hash['price'] = quantity.sell_price
+                            
+                            let offerPrice = 0;
+                            if(product.product_offer_percentage > 0){
+                                offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                            }
+                            inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+
+                            let newPercentage = 0;
+                            if (product.product_offer_percentage > 0){
+                                offerPrice = product.sell_price * product.product_offer_percentage/100;
+                                newPercentage = Math.floor((((product.sell_price + offerPrice) - product.sell_price)/(product.sell_price + offerPrice))*100);
+                            }
+                            inner_hash['product_offer_percentage'] = newPercentage;
+                        })
+                    }
+
+                    inner_hash['category_name'] = product.Category.category_name;
+                    inner_hash['sub_category_id'] = product.SubCategory.id;
+                    inner_hash['sub_category_name'] = product.SubCategory.sub_category_name;
+        
+                    itemListHash[product.category_id].push(inner_hash);
+                    itemsListArray.push(inner_hash)
+                });
+            })
+        }
+    
+        return res.status(200).send(itemListHash);
+    } catch (error) {
+        console.error('Error retrieving grouped data:', error);
+        throw error;
+    }
+}
+
+async function getSareeListForHomePageOld(req, res){
+    try {
+        let itemsListArray = [];
+        let itemListHash = {};
         const groupedData = await ProductModel.findAll({
            // group: ['Product.sub_category_id'],
+	        where:{
+                active_status: 1
+            },
             include: [{
                 model: productImageModel,
                 as: "Product_Image"
             },{
                 model: quantityModel,
                 as: 'Quantity',
-                /*where: {
+                where: {
                     no_of_product: {
                         [Op.gt]: 0,
                     }
-                }*/
-                order: [['no_of_product', 'DESC']]
+                }/*,
+                order: [['no_of_product', 'DESC']]*/
               },{
                 model: categoryModel,
                 as: 'Category'
@@ -1280,10 +1468,13 @@ async function getSareeListForHomePage(req, res){
                 model: subCategoryModel,
                 as: 'SubCategory'
               }],
-            order: [
+            /*order: [
                 ['updatedAt', 'DESC'],
                 [{ model: productImageModel, as: 'Product_Image' }, 'primary', 'DESC']
-            ]  
+            ]  */
+            group: ['group_id'],
+            order: sequelize.literal('RAND()'),
+            
         }).then((products) => {
             products.forEach((product) => {
                 console.log(product.category_id.toString() in itemListHash)
@@ -1321,6 +1512,13 @@ async function getSareeListForHomePage(req, res){
                             offerPrice = quantity.sell_price * product.product_offer_percentage/100
                         }
                         inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+
+                        let newPercentage = 0;
+                        if (product.product_offer_percentage > 0){
+                            offerPrice = product.sell_price * product.product_offer_percentage/100;
+                            newPercentage = Math.floor((((product.sell_price + offerPrice) - product.sell_price)/(product.sell_price + offerPrice))*100);
+                        }
+                        inner_hash['product_offer_percentage'] = newPercentage;
                     })
                 }
 
@@ -1587,5 +1785,5 @@ async function deleteProductStock(req, res) {
   
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalCreateGroupID, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock
 }

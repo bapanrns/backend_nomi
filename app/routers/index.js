@@ -8,15 +8,15 @@ const bodyParser = require('body-parser');
 
 const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress, forgotPassword, setNewPassword} = require('../controllers/userController')
 // Category Controller
-const {handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList} = require('../controllers/categoryController')
+const {handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList, handalDeleteCategoryById} = require('../controllers/categoryController')
 // Sub Category Controller
 const {handalSaveSubCategory, handalAllSubCategory, handalFindSubCategoryById, handalDeleteSubCategoryById, handalFindSubCategoryByCategoryId} = require('../controllers/subCategoryController')
 // Product Fabric Controller
 const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById, fetchFabricForFontend} = require('../controllers/productFabricController')
 // Product Controller
-const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock} = require('../controllers/productController')
+const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalCreateGroupID, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock} = require('../controllers/productController')
 // Buy Controller
-const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList } = require('../controllers/buyController')
+const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList, deleteBuyProductDetails } = require('../controllers/buyController')
 
 const { getSameColorWiseItem } = require('../controllers/productImageController')
 
@@ -57,58 +57,61 @@ router.route("/forgotPassword").post(forgotPassword);
 router.route("/setNewPassword").post(setNewPassword);
 
 // ------------------- Category -----------------
-router.route("/categoryAdd").post(handalSaveCategory);
+router.route("/categoryAdd").post(checkAuth, checkUserRole(['adMin']), handalSaveCategory);
 router.route("/AllCategory").post(handalAllCategory);
 router.route("/categoryFindId").post(handalFindCategoryById);
 router.route("/getCategoryList").post(getCategoryList);
+router.route("/deleteCategory").post(checkAuth, checkUserRole(['adMin']), handalDeleteCategoryById);
 
 // ------------------- Sub Category -----------------
 router.route("/subCategoryAdd").post(checkAuth, checkUserRole(['adMin']), handalSaveSubCategory);
 router.route("/AllSubCategory").post(handalAllSubCategory);
 router.route("/subCategoryFindId").post(handalFindSubCategoryById);
-router.route("/deleteSubCategory").post(handalDeleteSubCategoryById);
+router.route("/deleteSubCategory").post(checkAuth, checkUserRole(['adMin']), handalDeleteSubCategoryById);
 router.route("/subCategoryFindCategoryId").post(handalFindSubCategoryByCategoryId);
 
 // ------------------- Product Fabric -----------------
-router.route("/productFabricAdd").post(handalSaveProductFabric);
+router.route("/productFabricAdd").post(checkAuth, checkUserRole(['adMin']), handalSaveProductFabric);
 router.route("/AllProductFabric").post(handalAllProductFabric);
 router.route("/ProductFabricFindId").post(handalFindProductFabricById);
-router.route("/deleteProductFabric").post(handalDeleteProductFabricById);
+router.route("/deleteProductFabric").post(checkAuth, checkUserRole(['adMin']), handalDeleteProductFabricById);
 router.route("/fetchFabric").post(fetchFabricForFontend);
 
 // ------------------- Product -----------------
-router.route("/productAdd").post(handalSaveProduct);
-router.route("/AllProduct").post(handalAllProduct);
-router.route("/ProductFindById").post(handalFindProductById);
-router.route("/deleteProduct").post(handalDeleteProductById);
-router.route("/UpdateGroupID").post(handalUpdateGroupId);
-router.route("/deleteProductImage").post(handalDeleteProductImage);
-router.route("/productAactiveInactive").post(productAactiveInactive);
+router.route("/productAdd").post(checkAuth, checkUserRole(['adMin']), handalSaveProduct);
+router.route("/AllProduct").post(checkAuth, checkUserRole(['adMin']), handalAllProduct);
+router.route("/ProductFindById").post(checkAuth, checkUserRole(['adMin']), handalFindProductById);
+router.route("/deleteProduct").post(checkAuth, checkUserRole(['adMin']), handalDeleteProductById);
+router.route("/createGroupID").post(checkAuth, checkUserRole(['adMin']), handalCreateGroupID);
+router.route("/UpdateGroupID").post(checkAuth, checkUserRole(['adMin']), handalUpdateGroupId);
+router.route("/deleteProductImage").post(checkAuth, checkUserRole(['adMin']), handalDeleteProductImage);
+router.route("/productAactiveInactive").post(checkAuth, checkUserRole(['adMin']), productAactiveInactive);
 router.route("/findProductImage").post(findProductImage);
-router.route("/setPrimaryImage").post(setPrimaryImage);
+router.route("/setPrimaryImage").post(checkAuth, checkUserRole(['adMin']), setPrimaryImage);
 router.route("/fetchItemTypeList").post(fetchItemTypeList)
 router.route("/getItemsList").post(getItemsList)
 router.route("/getItemsDetails").post(getItemsDetails)
 router.route("/getSimilarProducts").post(getSimilarProducts)
 router.route("/getSareeListForHomePage").post(getSareeListForHomePage)
-router.route("/allProductStock").post(checkAuth, checkUserRole(['adMin']),allProductStock)
-router.route("/saveProductStock").post(checkAuth, checkUserRole(['adMin']),saveProductStock)
-router.route("/updateQuantity").post(checkAuth, checkUserRole(['adMin']),updateQuantity)
-router.route("/deleteProductStock").post(checkAuth, checkUserRole(['adMin']),deleteProductStock)
+router.route("/allProductStock").post(checkAuth, checkUserRole(['adMin']), allProductStock)
+router.route("/saveProductStock").post(checkAuth, checkUserRole(['adMin']), saveProductStock)
+router.route("/updateQuantity").post(checkAuth, checkUserRole(['adMin']), updateQuantity)
+router.route("/deleteProductStock").post(checkAuth, checkUserRole(['adMin']), deleteProductStock)
 // -------------------- Product Images ------------------------
 router.route("/getSameColorWiseItem").post(getSameColorWiseItem);
 
 // -------------------- Shop -----------------------
-router.route("/shopAdd").post(SaveShopDetails);
-router.route("/allShop").post(AllShopDetails);
-router.route("/allShopList").post(AllShopDetailsList);
-router.route("/findShop").post(findShopDetailsByPK);
-router.route("/deleteShop").post(deleteShopById);
+router.route("/shopAdd").post(checkAuth, checkUserRole(['adMin']), SaveShopDetails);
+router.route("/allShop").post(checkAuth, checkUserRole(['adMin']), AllShopDetails);
+router.route("/allShopList").post(checkAuth, checkUserRole(['adMin']), AllShopDetailsList);
+router.route("/findShop").post(checkAuth, checkUserRole(['adMin']), findShopDetailsByPK);
+router.route("/deleteShopeName").post(checkAuth, checkUserRole(['adMin']), deleteShopById);
 
 // -------------------- Buy Products -----------------------
-router.route("/saveBuyProduct").post(saveBuyProduct);
-router.route("/allBuyProduct").post(AllBuyProductDetails);
-router.route("/findBuyProductByPK").post(findBuyProductByPK);
+router.route("/saveBuyProduct").post(checkAuth, checkUserRole(['adMin']), saveBuyProduct);
+router.route("/allBuyProduct").post(checkAuth, checkUserRole(['adMin']), AllBuyProductDetails);
+router.route("/findBuyProductByPK").post(checkAuth, checkUserRole(['adMin']), findBuyProductByPK);
+router.route("/deleteBuyProductDetails").post(checkAuth, checkUserRole(['adMin']), deleteBuyProductDetails);
 //router.route("/deleteShop").post(deleteShopById);
 
 // -------------------- Delivery -----------------------
@@ -116,7 +119,7 @@ router.route("/checkDeliveryCode").post(checkDeliveryCode);
 
 // -------------------- Cart  ---------------------------
 
-router.route("/getCartData").post(getCartData);
+router.route("/getCartData").post(checkAuth, getCartData);
 router.route("/saveCartData").post(checkAuth, saveCartData);
 router.route("/removeCartData").post(checkAuth, removeCartData);
 router.route("/saveCartDataWhenLogin").post(checkAuth, saveCartDataWhenLogin);

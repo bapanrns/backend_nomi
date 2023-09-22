@@ -110,6 +110,9 @@ Product.init({
         type: DataTypes.INTEGER(10),
         comment: 'return_available only for 1',
         defaultValue: 1
+    },return_avaliable:{
+        type: DataTypes.STRING(10),
+        defaultValue: "yes"
     }
 }, {
   // Other model options go here

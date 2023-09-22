@@ -115,12 +115,22 @@ async function findShopDetailsByPK(req, res){
 
 async function deleteShopById(req, res){
     const id = req.body.id;
-    await ProductFabricModel.update({ active_status: 0 }, {
-        where: {
-            id: req.body.id
+    try {
+        if(id > 0){
+            const deletedBuyDetails = await ShopDetailsModal.destroy({
+                where: { 
+                    id: id
+                },
+            });
+            console.log(deletedBuyDetails);
+            return res.status(200).send({success: true});
+        }else{
+            return res.status(200).send({success: false});
         }
-    });
-    return res.status(200).send("Deleted Successfully");
+    } catch (error) {
+        console.error('Error deleting buy details:', error);
+        return res.status(200).send({success: false});
+    }
 }
 
 // ---------------------------------------------------------------------------------------
@@ -145,7 +155,8 @@ async function saveBuyProduct(req, res){
     if(req.body.bill !=="" && OriginBill != req.body.bill){
         base64Image = req.body.bill;
         decodedImage = uploadMiddleware.decodeBase64Image(base64Image);
-        imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/bill/'+decodedImage.name);
+        //imagePath = path.resolve('/Bapan/React/frontend_nomi/src/images/bill/'+decodedImage.name);
+        imagePath = path.resolve('/home/nomimart/public_html/images/bill/'+decodedImage.name);
         bill_name = decodedImage.name;
     }
     const inner_hash = {
@@ -183,15 +194,18 @@ async function saveBuyProduct(req, res){
         fs.writeFileSync(imagePath, decodedImage.data);
         // Remove file
         if(OriginBill !=""){
-            if(fileCheck("/Bapan/React/frontend_nomi/src/images/bill/"+OriginBill)){
-
-                fs.access("/Bapan/React/frontend_nomi/src/images/bill/"+OriginBill, fs.constants.F_OK, (error) => {
+            ///home/nomimart/public_html/images/
+            //if(fileCheck("/Bapan/React/frontend_nomi/src/images/bill/"+OriginBill)){
+            if(fileCheck("/home/nomimart/public_html/images/bill/"+OriginBill)){
+                //fs.access("/Bapan/React/frontend_nomi/src/images/bill/"+OriginBill, fs.constants.F_OK, (error) => {
+                fs.access("/home/nomimart/public_html/images/bill/"+OriginBill, fs.constants.F_OK, (error) => {
                     if (error) {
                         console.error('File does not exist:', error);
                     } else {
                        // File Exist
 
-                        fs.unlink("/Bapan/React/frontend_nomi/src/images/bill/"+OriginBill,function(err){
+                        //fs.unlink("/Bapan/React/frontend_nomi/src/images/bill/"+OriginBill,function(err){
+                        fs.unlink("/home/nomimart/public_html/images/bill/"+OriginBill,function(err){
                             if(err) return console.log(err);
                             console.log('file deleted successfully');
                         })
@@ -301,7 +315,26 @@ async function findBuyProductByPK(req, res){
     }
     return res.status(200).send(inner_hash);
 }
+
+async function deleteBuyProductDetails(req, res){
+    try {
+        if(req.body.id > 0){
+            const deletedBuyDetails = await buyProductDetailsModal.destroy({
+                where: { 
+                    id: req.body.id
+                },
+            });
+            console.log(deletedBuyDetails);
+            return res.status(200).send({success: true});
+        }else{
+            return res.status(200).send({success: false});
+        }
+    } catch (error) {
+        console.error('Error deleting buy details:', error);
+        return res.status(200).send({success: false});
+    }
+}
  
 module.exports = {
-    SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList
+    SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList, deleteBuyProductDetails
 }

@@ -30,8 +30,8 @@ function customLogger ( queryString, queryObject ) {
       logger.debug(_insert(queryString))
     }
 }
-
-const sequelize = new Sequelize('more_buy', 'root', '', {
+const sequelize = new Sequelize('nomimart_bapan', 'nomimart_bapan', 'MTbapan@1', {
+//const sequelize = new Sequelize('nomimart_bapan', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     logQueryParameters: true,
