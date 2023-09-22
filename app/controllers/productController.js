@@ -1416,8 +1416,8 @@ async function getSareeListForHomePage(req, res){
 
                             let newPercentage = 0;
                             if (product.product_offer_percentage > 0){
-                                offerPrice = product.sell_price * product.product_offer_percentage/100;
-                                newPercentage = Math.floor((((product.sell_price + offerPrice) - product.sell_price)/(product.sell_price + offerPrice))*100);
+                                offerPrice = quantity.sell_price * product.product_offer_percentage/100;
+                                newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
                             }
                             inner_hash['product_offer_percentage'] = newPercentage;
                         })
