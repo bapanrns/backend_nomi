@@ -193,10 +193,10 @@ stockModel.belongsTo(Product,{
 });*/
 
 const deliveryBoyModel = require("./app/models/deliveryBoyModel");
-deliveryBoyModel.sync({ force: true });
+//deliveryBoyModel.sync({ force: true });
 
 const deliveryBoyCoversPincode = require("./app/models/deliveryBoyCoversPincode");
-deliveryBoyCoversPincode.sync({ force: true })
+//deliveryBoyCoversPincode.sync({ force: true })
 
 deliveryBoyModel.hasMany(deliveryBoyCoversPincode,{
     foreignKey: 'delivery_boy_id', 
@@ -216,7 +216,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 //app.use("/new_address", userRouter)
 
 app.use("/api", router)
+
 app.listen(3000, () => {
-//app.listen(8081, () => {
     console.log('Server started on port 3000');
   });

@@ -552,14 +552,9 @@ async function allOrderDetails1(req, res){
 async function allOrderDetails(req, res) {
     try {
       let orderStatus = "";
-      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status
-        FROM orders o,
-        products p, 
-        order_items oi 
-        WHERE oi.product_id = p.id 
-        AND o.id = oi.order_id 
-        -- AND oi.order_status = 'Pending'
-        order by o.id, o.delivery_pincode`);
+      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status FROM Orders o, Products p, order_Items oi WHERE oi.product_id = p.id AND o.id = oi.order_id 
+      -- AND oi.order_status = 'Pending' 
+      ORDER BY o.id, o.delivery_pincode`);
   
         // Handle the results here
         const orderIDs = results[0].map(result => result['pId']);
