@@ -551,20 +551,22 @@ async function allOrderDetails1(req, res){
 
 async function allOrderDetails(req, res) {
     try {
-      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id, oi.order_status 
+      let orderStatus = "";
+      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status
         FROM orders o,
         products p, 
         order_items oi 
         WHERE oi.product_id = p.id 
         AND o.id = oi.order_id 
-        AND oi.order_status = 'Pending'`);
+        -- AND oi.order_status = 'Pending'
+        order by o.id, o.delivery_pincode`);
   
         // Handle the results here
         const orderIDs = results[0].map(result => result['pId']);
-        console.log(orderIDs);
+        //console.log(orderIDs);
         const imageHash = await getProductImage(orderIDs);
 
-        console.log(imageHash);
+        //console.log(imageHash);
 
         const orderArray = [];
 
@@ -572,13 +574,17 @@ async function allOrderDetails(req, res) {
             console.log(resultObj);
             let innerHash = {};
             innerHash["orderId"] = resultObj.orderId;
+            innerHash["orderItemId"] = resultObj.orderItemId;
             innerHash["pId"] = resultObj.pId;
             innerHash["product_name"] = resultObj.product_name;
             innerHash["product_image"] = imageHash[resultObj.pId];
             innerHash["quantity"] = resultObj.quantity;
             innerHash["price"] = resultObj.price;
+            innerHash["total_amount"] = resultObj.total_amount
             innerHash["size"] = resultObj.size;
+            innerHash["delivery_pincode"] = resultObj.delivery_pincode;
             innerHash["is_open_delivery"] = resultObj.is_open_delivery;
+            innerHash["order_status"] = resultObj.order_status;
             orderArray.push(innerHash);
         })
 
@@ -614,6 +620,51 @@ async function getProductImage(pIds){
     return imageHass;
 }
 
+async function handalUpdateOrderStatus(req, res) {
+    console.log("handalUpdateOrderStatus");
+    try {
+        const { OrderStatus, orderMessage, id } = req.body;
+
+       console.log(req.body);
+/*
+        const OrderStatus =  req.body.OrderStatus;
+        const orderMessage =  req.body.orderMessage;
+        const id =  req.body.id;
+*/
+        console.log(OrderStatus, orderMessage, id);
+        
+
+        // Validate input data
+        if (OrderStatus == "" ) {
+            return res.status(200).json({ message: "Both OrderStatus and orderMessage are missing.", status: false });
+        }
+
+        const updateData = {};
+
+        if (OrderStatus) {
+            updateData.order_status = OrderStatus;
+        }
+
+        if (orderMessage) {
+            updateData.order_message = orderMessage;
+        }
+
+        const updatedRows = await OrderItemModels.update(updateData, {
+            where: { id }
+        });
+
+        if (updatedRows > 0) {
+            return res.status(200).json({ message: "Update successful", status: true });
+        } else {
+            return res.status(200).json({ message: "No matching record found for the given id.", status: false });
+        }
+    } catch (error) {
+        console.error("Error updating order:", error);
+        return res.status(200).json({ message: "Internal server error", status: false });
+    }
+}
+
+
 module.exports = {
-    continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, productAvailability, returnOrderItem, allOrderDetails
+    continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, productAvailability, returnOrderItem, allOrderDetails, handalUpdateOrderStatus
 }

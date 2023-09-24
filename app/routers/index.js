@@ -20,11 +20,11 @@ const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, sav
 
 const { getSameColorWiseItem } = require('../controllers/productImageController')
 
-const { checkDeliveryCode } = require('../controllers/deliveryController')
+const { checkDeliveryCode, handalGetPinCode, deliveryBoyDataSave, findAlldeliveryBoy } = require('../controllers/deliveryController')
 
 const { getCartData, saveCartData, removeCartData, saveCartDataWhenLogin } = require('../controllers/cartController')
 
-const {continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, returnOrderItem, allOrderDetails} = require('../controllers/orderController')
+const {continueToBuy, checkProductAvailability, getOrderData, cancelOrderItem, returnOrderItem, allOrderDetails, handalUpdateOrderStatus} = require('../controllers/orderController')
 
 const app = express();
 
@@ -116,6 +116,9 @@ router.route("/deleteBuyProductDetails").post(checkAuth, checkUserRole(['adMin']
 
 // -------------------- Delivery -----------------------
 router.route("/checkDeliveryCode").post(checkDeliveryCode);
+router.route("/getPinCode").post(handalGetPinCode);
+router.route("/deliveryBoyDataSave").post(checkAuth, checkUserRole(['adMin']), deliveryBoyDataSave);
+router.route("/alldeliveryBoy").post( findAlldeliveryBoy)
 
 // -------------------- Cart  ---------------------------
 
@@ -131,6 +134,7 @@ router.route("/getOrderData").post(checkAuth, getOrderData)
 router.route("/cancelOrderItem").post(checkAuth, cancelOrderItem)
 router.route("/returnOrderItem").post(checkAuth, returnOrderItem)
 router.route("/allOrderDetails").post( allOrderDetails)
+router.route("/UpdateOrderStatus").post(checkAuth, checkUserRole(['adMin']),  handalUpdateOrderStatus)
 
 
 

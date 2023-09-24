@@ -4,6 +4,7 @@ const {db} = require('./database/connection');
 //const userRouter = require('./app/routers/user');
 const router = require('./app/routers');
 const bodyParser = require('body-parser');
+//require('dotenv').config();
 
 const cors = require('cors');
 
@@ -161,7 +162,7 @@ orderModels.belongsTo(Address,{
 
 const orderItemModels = require("./app/models/orderItemModels");
 //orderItemModels.sync({ force: true })
-//orderItemModels.sync({ alter: true })
+orderItemModels.sync({ alter: true })
 
 orderModels.hasMany(orderItemModels,{
     foreignKey: 'order_id',
@@ -191,6 +192,22 @@ stockModel.belongsTo(Product,{
     as: 'Product'
 });*/
 
+const deliveryBoyModel = require("./app/models/deliveryBoyModel");
+deliveryBoyModel.sync({ force: true });
+
+const deliveryBoyCoversPincode = require("./app/models/deliveryBoyCoversPincode");
+deliveryBoyCoversPincode.sync({ force: true })
+
+deliveryBoyModel.hasMany(deliveryBoyCoversPincode,{
+    foreignKey: 'delivery_boy_id', 
+    as: 'Delivery_Boy_Pincode'
+});
+
+deliveryBoyCoversPincode.belongsTo(deliveryBoyModel,{
+    foreignKey: 'id',
+    as: 'Delivery_Boy'
+});
+
 // Set up the middleware to parse incoming requests
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -199,7 +216,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 //app.use("/new_address", userRouter)
 
 app.use("/api", router)
-
 app.listen(3000, () => {
+//app.listen(8081, () => {
     console.log('Server started on port 3000');
   });

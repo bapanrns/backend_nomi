@@ -41,6 +41,8 @@ order_Item.init({
     type: DataTypes.INTEGER
   },return_delivery_boy_id:{
     type: DataTypes.INTEGER
+  },order_message:{
+    type: DataTypes.STRING(255)
   }
 }, {
   // Other model options go here
