@@ -1569,7 +1569,7 @@ async function saveProductStock(req, res){
         quantityArray.push(
             {
                 product_id: req.body.order_id,
-                bill_id: req.body.bill_id_and_shop_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
                 no_of_product: req.body.quantity,
                 size: "",
                 buy_price: req.body.quantity_buy_price,
@@ -1581,7 +1581,7 @@ async function saveProductStock(req, res){
         quantityArray.push(
             {
                 product_id: req.body.order_id,
-                bill_id: req.body.bill_id_and_shop_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
                 no_of_product: req.body.quantityXs,
                 size: "XS",
                 buy_price: req.body.quantityXs_buy_price,
@@ -1593,7 +1593,7 @@ async function saveProductStock(req, res){
         quantityArray.push(
             {
                 product_id: req.body.order_id,
-                bill_id: req.body.bill_id_and_shop_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
                 no_of_product: req.body.quantityS,
                 size: "S",
                 buy_price: req.body.quantityS_buy_price,
@@ -1605,7 +1605,7 @@ async function saveProductStock(req, res){
         quantityArray.push(
             {
                 product_id: req.body.order_id,
-                bill_id: req.body.bill_id_and_shop_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
                 no_of_product: req.body.quantityL,
                 size: "L",
                 buy_price: req.body.quantityL_buy_price,
@@ -1617,7 +1617,7 @@ async function saveProductStock(req, res){
         quantityArray.push(
             {
                 product_id: req.body.order_id,
-                bill_id: req.body.bill_id_and_shop_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
                 no_of_product: req.body.quantityM,
                 size: "M",
                 buy_price: req.body.quantityM_buy_price,
@@ -1629,7 +1629,7 @@ async function saveProductStock(req, res){
         quantityArray.push(
             {
                 product_id: req.body.order_id,
-                bill_id: req.body.bill_id_and_shop_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
                 no_of_product: req.body.quantityXl,
                 size: "XL",
                 buy_price: req.body.quantityXl_buy_price,
@@ -1642,7 +1642,7 @@ async function saveProductStock(req, res){
         quantityArray.push(
             {
                 product_id: req.body.order_id,
-                bill_id: req.body.bill_id_and_shop_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
                 no_of_product: req.body.quantity2Xl,
                 size: "2XL",
                 buy_price: req.body.quantity2Xl_buy_price,
