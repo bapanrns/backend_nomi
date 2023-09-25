@@ -543,7 +543,7 @@ async function allOrderDetails1(req, res){
           // Handle errors
     });
       
-    console.log(orderArray);
+    //console.log(orderArray);
         
     return res.status(200).send([{delivery_pincode: 5, total_amount: 5000, id: 5}]);
 }
@@ -551,9 +551,18 @@ async function allOrderDetails1(req, res){
 
 async function allOrderDetails(req, res) {
     try {
+        let whereClase = "";
+        if(req.body.status !=""){
+            whereClase = ` AND oi.order_status = '${req.body.status}' `
+        }
+
+        if(req.body.pincode !=""){
+            whereClase += ` AND o.delivery_pincode = '${req.body.pincode}' `
+        }
+
       let orderStatus = "";
       const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status FROM Orders o, Products p, order_Items oi WHERE oi.product_id = p.id AND o.id = oi.order_id 
-      -- AND oi.order_status = 'Pending' 
+       ${whereClase}
       ORDER BY o.id, o.delivery_pincode`);
   
         // Handle the results here
@@ -566,7 +575,7 @@ async function allOrderDetails(req, res) {
         const orderArray = [];
 
         results[0].forEach((resultObj, key) => {
-            console.log(resultObj);
+           // console.log(resultObj);
             let innerHash = {};
             innerHash["orderId"] = resultObj.orderId;
             innerHash["orderItemId"] = resultObj.orderItemId;
@@ -616,17 +625,17 @@ async function getProductImage(pIds){
 }
 
 async function handalUpdateOrderStatus(req, res) {
-    console.log("handalUpdateOrderStatus");
+    //console.log("handalUpdateOrderStatus");
     try {
         const { OrderStatus, orderMessage, id } = req.body;
 
-       console.log(req.body);
+       //console.log(req.body);
 /*
         const OrderStatus =  req.body.OrderStatus;
         const orderMessage =  req.body.orderMessage;
         const id =  req.body.id;
 */
-        console.log(OrderStatus, orderMessage, id);
+        //console.log(OrderStatus, orderMessage, id);
         
 
         // Validate input data

@@ -252,8 +252,7 @@ async function forgotPassword(req, res){
             var mailOptions = {
                 from: 'bapan.rns@gmail.com',
                 to: req.body.email,
-                // to: 'roymrinmoy2000@gmail.com',
-                subject: 'NomiMart.in New OTP',
+                subject: 'BsKart.com New OTP',
                 html: `Your OTP code is: ${newOtp}`
             };
       
@@ -302,8 +301,7 @@ async function setNewPassword(req, res){
             var mailOptions = {
                 from: 'bapan.rns@gmail.com',
                 to: req.body.email,
-                // to: 'roymrinmoy2000@gmail.com',
-                subject: 'NomiMart.in Password Change',
+                subject: 'BsKart.com Password Change',
                 html: `Password changed successfully`
             };
       
