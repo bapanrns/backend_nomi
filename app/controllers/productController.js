@@ -273,6 +273,18 @@ async function handalSaveProduct(req, res){
                                                 );
             }
 
+            if(quantityArray.length == 0){
+                quantityArray.push(
+                    {
+                        product_id: productId,
+                        no_of_product: 0,
+                        size: "",
+                        buy_price: 0,
+                        sell_price: 0
+                    }
+                )
+            }
+
             //console.log(quantityArray);
             const quantity = await quantityModel.bulkCreate(quantityArray);
         }
