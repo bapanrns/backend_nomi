@@ -54,7 +54,9 @@ async function handalSaveProduct(req, res){
                     fabric_care: req.body.fabric_care,
                     bill_id: bill_id,
                     shop_id: shop_id,
-                    return_avaliable: req.body.return_avaliable
+                    return_avaliable: req.body.return_avaliable,
+                    material: req.body.material,
+                    stone_type: req.body.stone_type
                 }
     if(req.body.id > 0){
         // Edit
@@ -644,7 +646,9 @@ async function handalFindProductById(req, res){
         weight:"",
         youtube_link: "",
         fabric_care: "",
-        bill_id_and_shop_id: ""
+        bill_id_and_shop_id: "",
+        material: "",
+        stone_type: ""
     }
     if(id !=""){
         let whereCluse = {}
@@ -700,6 +704,8 @@ async function handalFindProductById(req, res){
                 productHash['return_avaliable'] = product.return_avaliable;
                 productHash['fabric_care'] = product.fabric_care;
                 productHash['bill_id_and_shop_id'] = product.bill_id+"@"+product.shop_id;
+                productHash['material'] = product.material;
+                productHash['stone_type'] = product.stone_type;
 
                 const quantityArray = [];
                 product.Quantity.forEach((quantity) => {
@@ -1186,6 +1192,19 @@ async function getItemsDetails(req, res){
 
     const productArray = [];
     productObj.forEach((productObj) => {
+        let type = "Single Kurti";
+        if(productObj.sub_category_id == 24){
+            type = "Kurta With Pent";
+        }else if(productObj.sub_category_id == 11){
+            type = "Kurta, Trouser/Pant & Dupatta Set";
+        }else if(productObj.sub_category_id == 16){
+            type = "Salwar, Trouser/Pant & Dupatta Set";
+        }
+        // For Category
+        if(productObj.category_id == 3){
+            type = productObj.company_name;
+        }
+
         const inner_hash = {
             item_id: productObj.id,
             category_id: productObj.category_id,
@@ -1207,7 +1226,10 @@ async function getItemsDetails(req, res){
             group_id: productObj.group_id,
             occasion: productObj.occasion,
             productSize: [],
-            return_avaliable: productObj.return_avaliable
+            return_avaliable: productObj.return_avaliable,
+            type: type,
+            material: productObj.material,
+            stone_type: productObj.stone_type
         }
         
         productObj.Product_Image.forEach((imgObj) => {

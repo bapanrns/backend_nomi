@@ -113,6 +113,12 @@ Product.init({
     },return_avaliable:{
         type: DataTypes.STRING(10),
         defaultValue: "yes"
+    },stone_type: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },material: {
+        type: DataTypes.STRING(255),
+        allowNull: true
     }
 }, {
   // Other model options go here
