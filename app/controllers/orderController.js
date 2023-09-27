@@ -10,6 +10,7 @@ const Cart = require('../models/cartModels');
 const addressModel = require('../models/addressModel');
 const productImageModel = require('../models/productImageModel');
 const userAccountDetails = require('../models/userAccountDetails');
+const deliveryBoyModel = require("../models/deliveryBoyModel");
 
 
 /*
@@ -101,7 +102,7 @@ async function continueToBuy(req, res) {
 
             if (obj.length > 0) {
                 itemFoundFlag = true;
-                whereClause[Op.or].push({
+                whereClause[Op.or].push({ 
                     product_id: product_id_size[0],
                     size: size
                 });
@@ -561,7 +562,11 @@ async function allOrderDetails(req, res) {
         }
 
       let orderStatus = "";
-      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status FROM Orders o, Products p, order_Items oi WHERE oi.product_id = p.id AND o.id = oi.order_id 
+      const deliveryBoyObj = await deliveryBoyModel.findAll();
+      const deliveryBoyHash = deliveryBoyObj.reduce((acc, obj) => ({ ...acc, [obj.id]: obj.name+" - "+obj.mobile_no }), {});
+
+
+      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status, oi.order_message, oi.delivery_boy_id FROM Orders o, Products p, order_Items oi WHERE oi.product_id = p.id AND o.id = oi.order_id 
        ${whereClase}
       ORDER BY o.id, o.delivery_pincode`);
   
@@ -589,6 +594,8 @@ async function allOrderDetails(req, res) {
             innerHash["delivery_pincode"] = resultObj.delivery_pincode;
             innerHash["is_open_delivery"] = resultObj.is_open_delivery;
             innerHash["order_status"] = resultObj.order_status;
+            innerHash["order_message"] = resultObj.order_message;
+            innerHash["delivery_boy_id"] = deliveryBoyHash[resultObj.delivery_boy_id];
             orderArray.push(innerHash);
         })
 
@@ -656,6 +663,13 @@ async function handalUpdateOrderStatus(req, res) {
         const updatedRows = await OrderItemModels.update(updateData, {
             where: { id }
         });
+
+        if(OrderStatus == "Reject" && ["We are not delivering to your address", "Your address information is incorrect"].includes(orderMessage)){
+            // Call with order_item_id
+            orderItemQuentityUpdate(req.body.id);
+            // Call with order_id
+            updateOrderPrice(req.body.orderId)
+        }
 
         if (updatedRows > 0) {
             return res.status(200).json({ message: "Update successful", status: true });

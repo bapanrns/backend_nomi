@@ -5,6 +5,7 @@ const pincodeModel = require("../models/pincodeModel");
 const newPincodeModel = require("../models/newPincodeModel");
 const deliveryBoyModel = require("../models/deliveryBoyModel");
 const Nodelogger = require("../loger/winstonlogger")
+const OrderItemModels = require("../models/orderItemModels");
 
 async function checkDeliveryCode(req, res){
     let returnMessage = "";
@@ -106,7 +107,48 @@ async function findAlldeliveryBoy(req, res){
       }
 }
 
+async function handalAssignDeliveryBoy(req, res){
+    try {
+        const { DeliveryBoyId, orderMessage, id } = req.body;
+
+       //console.log(req.body);
+/*
+        const OrderStatus =  req.body.OrderStatus;
+        const orderMessage =  req.body.orderMessage;
+        const id =  req.body.id;
+*/
+        //console.log(OrderStatus, orderMessage, id);
+        
+
+        // Validate input data
+        if (DeliveryBoyId == "" ) {
+            return res.status(200).json({ message: "Boy are missing.", status: false });
+        }
+
+        const updateData = {};
+
+        if (DeliveryBoyId) {
+            updateData.delivery_boy_id = DeliveryBoyId;
+        }
+
+        const updatedRows = await OrderItemModels.update(updateData, {
+            where: { id }
+        });
+
+        
+
+        if (updatedRows > 0) {
+            return res.status(200).json({ message: "Update successful", status: true });
+        } else {
+            return res.status(200).json({ message: "No matching record found for the given id.", status: false });
+        }
+    } catch (error) {
+        console.error("Error updating order:", error);
+        return res.status(200).json({ message: "Internal server error", status: false });
+    }
+}
+
 
 module.exports = {
-    checkDeliveryCode, handalGetPinCode, deliveryBoyDataSave, findAlldeliveryBoy
+    checkDeliveryCode, handalGetPinCode, deliveryBoyDataSave, findAlldeliveryBoy, handalAssignDeliveryBoy
 }

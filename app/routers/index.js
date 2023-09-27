@@ -20,7 +20,7 @@ const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, sav
 
 const { getSameColorWiseItem } = require('../controllers/productImageController')
 
-const { checkDeliveryCode, handalGetPinCode, deliveryBoyDataSave, findAlldeliveryBoy } = require('../controllers/deliveryController')
+const { checkDeliveryCode, handalGetPinCode, deliveryBoyDataSave, findAlldeliveryBoy, handalAssignDeliveryBoy } = require('../controllers/deliveryController')
 
 const { getCartData, saveCartData, removeCartData, saveCartDataWhenLogin } = require('../controllers/cartController')
 
@@ -118,7 +118,8 @@ router.route("/deleteBuyProductDetails").post(checkAuth, checkUserRole(['adMin']
 router.route("/checkDeliveryCode").post(checkDeliveryCode);
 router.route("/getPinCode").post(handalGetPinCode);
 router.route("/deliveryBoyDataSave").post(checkAuth, checkUserRole(['adMin']), deliveryBoyDataSave);
-router.route("/alldeliveryBoy").post( findAlldeliveryBoy)
+router.route("/alldeliveryBoy").post(checkAuth, checkUserRole(['adMin']), findAlldeliveryBoy)
+router.route("/assignDeliveryBoy").post(checkAuth, checkUserRole(['adMin']), handalAssignDeliveryBoy)
 
 // -------------------- Cart  ---------------------------
 
