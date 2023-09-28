@@ -196,6 +196,8 @@ async function handalSaveProduct(req, res){
             // ---------------------------------------------------------------------------------------------------------------
 
             const quantityArray = [];
+            const stockQuantityArray = [];
+
             if (req.body.quantity > 0){
                 quantityArray.push(
                     {
@@ -206,6 +208,16 @@ async function handalSaveProduct(req, res){
                         sell_price: req.body.quantity_selling_price
                     }
                 )
+
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantity,
+                    size: "",
+                    buy_price: req.body.quantity_buy_price,
+                    sell_price: req.body.quantity_selling_price,
+                    status: "Complete"
+                });
             }
             if (req.body.quantityXs > 0){
                 quantityArray.push(
@@ -217,6 +229,16 @@ async function handalSaveProduct(req, res){
                         sell_price: req.body.quantityXs_selling_price
                     }
                 )
+
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantityXs,
+                    size: "XS",
+                    buy_price: req.body.quantityXs_buy_price,
+                    sell_price: req.body.quantityXs_selling_price,
+                    status: "Complete"
+                });
             }
             if (req.body.quantityS > 0){
                 quantityArray.push(
@@ -228,6 +250,17 @@ async function handalSaveProduct(req, res){
                         sell_price: req.body.quantityS_selling_price
                     }
                 )
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantityS,
+                    size: "S",
+                    buy_price: req.body.quantityS_buy_price,
+                    sell_price: req.body.quantityS_selling_price,
+                    status: "Complete"
+                });
             }
             if (req.body.quantityL > 0){
                 quantityArray.push(
@@ -239,6 +272,17 @@ async function handalSaveProduct(req, res){
                         sell_price: req.body.quantityL_selling_price
                     }
                 )
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantityL,
+                    size: "L",
+                    buy_price: req.body.quantityL_buy_price,
+                    sell_price: req.body.quantityL_selling_price,
+                    status: "Complete"
+                });
             }
             if (req.body.quantityM > 0){
                 quantityArray.push(
@@ -250,6 +294,17 @@ async function handalSaveProduct(req, res){
                         sell_price: req.body.quantityM_selling_price
                     }
                 )
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantityM,
+                    size: "M",
+                    buy_price: req.body.quantityM_buy_price,
+                    sell_price: req.body.quantityM_selling_price,
+                    status: "Complete"
+                });
             }
             if (req.body.quantityXl > 0){
                 quantityArray.push(
@@ -261,6 +316,17 @@ async function handalSaveProduct(req, res){
                         sell_price: req.body.quantityXl_selling_price
                     }
                 )
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantityXl,
+                    size: "XL",
+                    buy_price: req.body.quantityXl_buy_price,
+                    sell_price: req.body.quantityXl_selling_price,
+                    status: "Complete"
+                });
             }
 
             if (req.body.quantity2Xl > 0){
@@ -271,9 +337,83 @@ async function handalSaveProduct(req, res){
                                                     req.body.quantity2Xl_selling_price
                                                     )
                                                 );
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantity2Xl,
+                    size: "2XL",
+                    buy_price: req.body.quantity2Xl_buy_price,
+                    sell_price: req.body.quantity2Xl_selling_price,
+                    status: "Complete"
+                });
             }
 
-            if(quantityArray.length == 0){
+            if (req.body.quantity32 > 0){
+                quantityArray.push(await createQuantityHash(productId, 
+                                                    req.body.quantity32,
+                                                    size="32", 
+                                                    req.body.quantity32_buy_price, 
+                                                    req.body.quantity32_selling_price
+                                                    )
+                                                );
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantity32,
+                    size: "32",
+                    buy_price: req.body.quantity32_buy_price,
+                    sell_price: req.body.quantity32_selling_price,
+                    status: "Complete"
+                });
+            }
+            
+            if (req.body.quantity34 > 0){
+                quantityArray.push(await createQuantityHash(productId, 
+                                                    req.body.quantity34,
+                                                    size="34", 
+                                                    req.body.quantity34_buy_price, 
+                                                    req.body.quantity34_selling_price
+                                                    )
+                                                );
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantity34,
+                    size: "34",
+                    buy_price: req.body.quantity34_buy_price,
+                    sell_price: req.body.quantity34_selling_price,
+                    status: "Complete"
+                });
+            }
+            
+            if (req.body.quantity36 > 0){
+                quantityArray.push(await createQuantityHash(productId, 
+                                                    req.body.quantity36,
+                                                    size="36", 
+                                                    req.body.quantity36_buy_price, 
+                                                    req.body.quantity36_selling_price
+                                                    )
+                                                );
+
+                // Stock
+                stockQuantityArray.push({
+                    product_id: productId,
+                    bill_id: bill_id,
+                    no_of_product: req.body.quantity36,
+                    size: "36",
+                    buy_price: req.body.quantity36_buy_price,
+                    sell_price: req.body.quantity36_selling_price,
+                    status: "Complete"
+                });
+            }
+
+            /*if(quantityArray.length == 0){
                 quantityArray.push(
                     {
                         product_id: productId,
@@ -283,9 +423,11 @@ async function handalSaveProduct(req, res){
                         sell_price: 0
                     }
                 )
-            }
+            }*/
 
             //console.log(quantityArray);
+            // stock insert
+            stockModel.bulkCreate(stockQuantityArray);
             const quantity = await quantityModel.bulkCreate(quantityArray);
         }
     }
@@ -517,6 +659,7 @@ async function handalAllProduct(req, res) {
                 active_status,
                 Category: { category_name },
                 SubCategory: { sub_category_name },
+                youtube_link,
             } = product;
   
             const quantityArray = [];
@@ -544,6 +687,7 @@ async function handalAllProduct(req, res) {
                 quantity_2xl: "",
                 stock: stockCount,
                 active_status,
+                youtube_link,
             };
 
             if(product.Product_Image !=undefined){
@@ -642,6 +786,20 @@ async function handalFindProductById(req, res){
         quantity_2Xl_id: "",
         quantity2Xl_buy_price: "",
         quantity2Xl_selling_price: "",
+        
+        quantity32: "",
+        quantity_32_id: "",
+        quantity32_buy_price: "",
+        quantity32_selling_price: "",
+        quantity34: "",
+        quantity_34_id: "",
+        quantity34_buy_price: "",
+        quantity34_selling_price: "",
+        quantity36: "",
+        quantity_36_id: "",
+        quantity36_buy_price: "",
+        quantity36_selling_price: "",
+
         product_febric_id: "",
         product_febric: "",
         color: [],
@@ -754,6 +912,21 @@ async function handalFindProductById(req, res){
                         productHash['quantity_2Xl_id'] = quantity.id;
                         productHash['quantity2Xl_buy_price'] = quantity.buy_price;
                         productHash['quantity2Xl_selling_price'] = quantity.sell_price;
+                    }else if(quantity.size == "32"){
+                        productHash['quantity32'] = quantity.no_of_product;
+                        productHash['quantity_32'] = quantity.id;
+                        productHash['quantity32_buy_price'] = quantity.buy_price;
+                        productHash['quantity32_selling_price'] = quantity.sell_price;
+                    }else if(quantity.size == "34"){
+                        productHash['quantity34'] = quantity.no_of_product;
+                        productHash['quantity_34'] = quantity.id;
+                        productHash['quantity34_buy_price'] = quantity.buy_price;
+                        productHash['quantity34_selling_price'] = quantity.sell_price;
+                    }else if(quantity.size == "36"){
+                        productHash['quantity36'] = quantity.no_of_product;
+                        productHash['quantity_36'] = quantity.id;
+                        productHash['quantity36_buy_price'] = quantity.buy_price;
+                        productHash['quantity36_selling_price'] = quantity.sell_price;
                     }else{
                         productHash['quantity'] = quantity.no_of_product;
                         productHash['quantity_id'] = quantity.id;
@@ -1681,6 +1854,45 @@ async function saveProductStock(req, res){
                 size: "2XL",
                 buy_price: req.body.quantity2Xl_buy_price,
                 sell_price: req.body.quantity2Xl_selling_price
+            }
+        )
+    }
+
+    if (req.body.quantity32 > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
+                no_of_product: req.body.quantity32,
+                size: "32",
+                buy_price: req.body.quantity32_buy_price,
+                sell_price: req.body.quantity32_selling_price
+            }
+        )
+    }
+
+    if (req.body.quantity34 > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
+                no_of_product: req.body.quantity34,
+                size: "34",
+                buy_price: req.body.quantity34_buy_price,
+                sell_price: req.body.quantity34_selling_price
+            }
+        )
+    }
+
+    if (req.body.quantity36 > 0){
+        quantityArray.push(
+            {
+                product_id: req.body.order_id,
+                bill_id: req.body.bill_id_and_shop_id.split("@")[0],
+                no_of_product: req.body.quantity36,
+                size: "36",
+                buy_price: req.body.quantity36_buy_price,
+                sell_price: req.body.quantity36_selling_price
             }
         )
     }
