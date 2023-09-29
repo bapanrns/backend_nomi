@@ -1541,20 +1541,38 @@ async function getSareeListForHomePage(req, res){
         let itemsListArray = [];
         let itemListHash = {};
 
-
+/*
         const categories = await ProductModel.findAll({
             attributes: ['category_id'],
             group: ['category_id'],
         });
+*/
 
-        for (const category of categories) {
-            const categoryId = category.getDataValue('category_id');
+    const productCounts = await ProductModel.findAll({
+        attributes: [
+            [sequelize.fn('COUNT', sequelize.col('Product.id')), 'productCount'], // Count the number of products and alias it as 'productCount'
+        ],
+        include: [
+            {
+                model: subCategoryModel,
+                as: 'SubCategory',
+            },
+        ],
+        group: ['SubCategory.id'], // Group by SubCategory.id
+        raw: true, // Return plain JSON objects
+    });
+
+
+    const productCountHash = productCounts.reduce((hash, item) => ({ ...hash, [item['SubCategory.id']]: item.productCount }), {});
+
+        //for (const category of categories) {
+           // const categoryId = category.getDataValue('category_id');
 
             const groupedData = await ProductModel.findAll({
             // group: ['Product.sub_category_id'],
                 where:{
                     active_status: 1,
-                    category_id: categoryId
+                   // category_id: categoryId
                 },
                 include: [{
                     model: productImageModel,
@@ -1594,7 +1612,8 @@ async function getSareeListForHomePage(req, res){
                         item_id: product.id,
                         product_offer_percentage: product.product_offer_percentage,
                         product_name: product.product_name,
-                        company_name: product.company_name
+                        company_name: product.company_name,
+                        more_color: productCountHash[product.SubCategory.id] -1
                     }
                     
                     if(product.Product_Image !=undefined){
@@ -1638,7 +1657,7 @@ async function getSareeListForHomePage(req, res){
                     itemsListArray.push(inner_hash)
                 });
             })
-        }
+       // }
     
         return res.status(200).send(itemListHash);
     } catch (error) {
