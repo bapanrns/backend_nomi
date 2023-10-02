@@ -1390,6 +1390,11 @@ async function getItemsDetails(req, res){
             type = productObj.company_name;
         }
 
+        // For Category
+        if(productObj.category_id == 8){
+            type = productObj.company_name;
+        }
+
         const inner_hash = {
             item_id: productObj.id,
             category_id: productObj.category_id,
