@@ -18,7 +18,10 @@ async function getSameColorWiseItem(req, res){
             {
                 model: productImageModel,
                 as: "Product_Image",
-                attributes: ['image_name']
+                attributes: ['image_name'],
+                where: {
+                    primary: 1
+                }
             },{
                 model: quantityModel,
                 as: "Quantity",
