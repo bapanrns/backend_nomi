@@ -648,6 +648,7 @@ async function handalAllProduct(req, res) {
                     as: 'Product_Image',
                 }
             ],
+            order: [['id', 'DESC']]
         });
   
         for (const product of products) {
