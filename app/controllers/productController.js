@@ -1150,11 +1150,16 @@ async function fetchItemTypeList(req, res) {
                 }
             }
         });
+        let whereClase = {active_status: 1}
+        if (category) {
+            whereClase = {
+                category_id: category.dataValues.id,
+                active_status: 1
+            }
+        }
   
         const subCategories = await subCategoryModel.findAll({
-            where: {
-                category_id: category.dataValues.id
-            }
+            where: whereClase
         });
   
         subCategories.forEach((obj) => {
@@ -1175,9 +1180,18 @@ async function getItemsList(req, res){
     //console.log(req.body);
     Nodelogger.info(req.body);
 
+    let subCategories = await subCategoryModel.findAll();
+    let subCategoriesNamesArray = subCategories.map((subCategory) => subCategory.sub_category_name);
+
     // Where condition with Active status
     let whereCluse = {
         active_status: 1
+    }
+
+    let globalSearchString = req.body.globalSearch;
+
+    if(globalSearchString !=""){
+        req.body.serchFor = "";
     }
 
     // Fabric Where candition
@@ -1188,7 +1202,7 @@ async function getItemsList(req, res){
     }
 
     // Color Where candition
-    if(req.body.color.length > 0){
+    if(req.body.color.length > 0 ){
         whereCluse[Op.or] = [];
         req.body.color.forEach((color) => {
             let inner_hash = {
@@ -1205,13 +1219,21 @@ async function getItemsList(req, res){
     whereInclude.push({model: productImageModel, as: 'Product_Image'});
 
     // For category wise
-    if(req.body.serchFor !=""){
+    if(req.body.serchFor !="" || globalSearchString !=""){
+        let categoryWhereString = req.body.serchFor;
+        
+        if(globalSearchString !=""){
+            if(subCategoriesNamesArray.includes(globalSearchString)){
+                categoryWhereString = globalSearchString;
+            }
+        }
+        
         whereInclude.push({
             model: categoryModel, 
             as: 'Category',
             where: {
                 category_name: {
-                    [Op.like]: `%${req.body.serchFor}%`
+                    [Op.like]: `%${categoryWhereString}%`
                 }
             }
         });
@@ -1271,6 +1293,17 @@ async function getItemsList(req, res){
         whereCluse['product_offer_percentage'] = {
             [Op.in]: req.body.discount
         }
+    }
+
+    if(globalSearchString !=""){
+        whereCluse[Op.or]=[];
+
+        whereCluse[Op.or].push({ product_name: { [Op.like]: `%${globalSearchString}%` } });
+        whereCluse[Op.or].push({ company_name: { [Op.like]: `%${globalSearchString}%` }  });
+        whereCluse[Op.or].push({ occasion: { [Op.like]: `%${globalSearchString}%` }  });
+        whereCluse[Op.or].push({ product_febric: { [Op.like]: `%${globalSearchString}%` }  });
+        whereCluse[Op.or].push({ fabric_care: { [Op.like]: `%${globalSearchString}%` }  });
+        whereCluse[Op.or].push({ color: { [Op.like]: `%${globalSearchString}%` }  });
     }
     
     const productArray = [];

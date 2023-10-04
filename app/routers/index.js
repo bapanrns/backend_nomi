@@ -6,7 +6,7 @@ const checkUserRole = require('../helper/checkUserRoleMiddleware');
 
 const bodyParser = require('body-parser');
 
-const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress, forgotPassword, setNewPassword} = require('../controllers/userController')
+const {handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress, forgotPassword, setNewPassword, handleUserList} = require('../controllers/userController')
 // Category Controller
 const {handalSaveCategory, handalAllCategory, handalFindCategoryById, getCategoryList, handalDeleteCategoryById} = require('../controllers/categoryController')
 // Sub Category Controller
@@ -55,6 +55,7 @@ router.route("/saveUserRecord").post(saveUserRecord);
 router.route("/loginUser").post(loginUser);
 router.route("/forgotPassword").post(forgotPassword);
 router.route("/setNewPassword").post(setNewPassword);
+router.route("/userList").post(checkAuth, checkUserRole(['adMin']), handleUserList);
 
 // ------------------- Category -----------------
 router.route("/categoryAdd").post(checkAuth, checkUserRole(['adMin']), handalSaveCategory);

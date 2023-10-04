@@ -72,9 +72,8 @@ async function saveUserRecord(req, res){
 
             var mailOptions = {
                 from: 'bapan.rns@gmail.com',
-                to: `roymrinmoy2000@gmail.com`,
-                // to: 'roymrinmoy2000@gmail.com',
-                subject: 'Welcome to our system',
+                to: req.body.email_address,
+                subject: 'Welcome to our Website',
                 html: '<p>Hi </p><p>You are successfully registered in our system.</p>'
               };
       
@@ -95,7 +94,7 @@ async function saveUserRecord(req, res){
         if (error instanceof Sequelize.UniqueConstraintError) {
             // Handle unique constraint violation (duplicate phone number)
             console.error('Error: Phone number already exists:', req.body.mobile_no);
-            errorMessage = "Error: Phone number already exists: "+req.body.mobile_no;
+            errorMessage = "Error: Email Address or Phone number already exists: "+req.body.mobile_no;
         } else {
             // Handle other errors
             console.error('Error creating user:', error);
@@ -322,7 +321,36 @@ async function setNewPassword(req, res){
     });
     return res.status(200).send(returnMessage);
 }
+
+async function handleUserList(req, res) {
+    try {
+        const users = await UserModel.findAll({
+            where: {
+                user_type: {
+                    [Op.ne]: 'adMin'
+                }
+            },
+            attributes: ['id', 'name', 'email', 'phone', 'whatsapp', 'gender', 'createdAt'],
+            order: [['id', 'DESC']]
+        });
+  
+        const allUsers = users.map((user) => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            whatsapp: user.whatsapp,
+            gender: user.gender,
+            createdAt: user.createdAt
+        }));
+  
+        return res.status(200).json(allUsers);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Internal Server Error');
+    }
+}
  
 module.exports = {
-    handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress, forgotPassword, setNewPassword
+    handalSaveAddress, handalAllUesr, saveUserRecord, loginUser, getAddress, getAddressById, deleteAddress, forgotPassword, setNewPassword, handleUserList
 }
