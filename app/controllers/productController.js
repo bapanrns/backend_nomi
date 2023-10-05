@@ -1580,12 +1580,12 @@ async function getSareeListForHomePage(req, res){
         let itemsListArray = [];
         let itemListHash = {};
 
-/*
+
         const categories = await ProductModel.findAll({
             attributes: ['category_id'],
             group: ['category_id'],
         });
-*/
+
 
     const productCounts = await ProductModel.findAll({
         attributes: [
@@ -1604,14 +1604,14 @@ async function getSareeListForHomePage(req, res){
 
     const productCountHash = productCounts.reduce((hash, item) => ({ ...hash, [item['SubCategory.id']]: item.productCount }), {});
 
-        //for (const category of categories) {
-           // const categoryId = category.getDataValue('category_id');
+        for (const category of categories) {
+            const categoryId = category.getDataValue('category_id');
 
             const groupedData = await ProductModel.findAll({
             // group: ['Product.sub_category_id'],
                 where:{
                     active_status: 1,
-                   // category_id: categoryId
+                    category_id: categoryId
                 },
                 include: [{
                     model: productImageModel,
@@ -1696,7 +1696,7 @@ async function getSareeListForHomePage(req, res){
                     itemsListArray.push(inner_hash)
                 });
             })
-       // }
+        }
     
         return res.status(200).send(itemListHash);
     } catch (error) {
