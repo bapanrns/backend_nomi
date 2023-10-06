@@ -566,7 +566,7 @@ async function allOrderDetails(req, res) {
       const deliveryBoyHash = deliveryBoyObj.reduce((acc, obj) => ({ ...acc, [obj.id]: obj.name+" - "+obj.mobile_no }), {});
 
 
-      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status, oi.order_message, oi.delivery_boy_id FROM Orders o, Products p, order_Items oi WHERE oi.product_id = p.id AND o.id = oi.order_id 
+      const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status, oi.order_message, oi.delivery_boy_id, o.delivery_address_id, o.createdAt FROM Orders o, Products p, order_Items oi WHERE oi.product_id = p.id AND o.id = oi.order_id 
        ${whereClase}
       ORDER BY o.id, o.delivery_pincode`);
   
@@ -596,6 +596,8 @@ async function allOrderDetails(req, res) {
             innerHash["order_status"] = resultObj.order_status;
             innerHash["order_message"] = resultObj.order_message;
             innerHash["delivery_boy_id"] = deliveryBoyHash[resultObj.delivery_boy_id];
+            innerHash["delivery_address_id"]=resultObj.delivery_address_id;
+            innerHash["createdAt"]=resultObj.createdAt;
             orderArray.push(innerHash);
         })
 

@@ -6,6 +6,7 @@ const newPincodeModel = require("../models/newPincodeModel");
 const deliveryBoyModel = require("../models/deliveryBoyModel");
 const Nodelogger = require("../loger/winstonlogger")
 const OrderItemModels = require("../models/orderItemModels");
+const Address = require("../models/addressModel");
 
 async function checkDeliveryCode(req, res){
     let returnMessage = "";
@@ -148,7 +149,21 @@ async function handalAssignDeliveryBoy(req, res){
     }
 }
 
+async function handalGetDeliveryAddress(req, res){
+    try {
+        let addressObj = await Address.findOne({
+            where:{
+                id: req.body.id
+            }
+        });
+        return res.status(200).send(addressObj);
+    }catch(error){
+        console.error("Error updating order:", error);
+        return res.status(200).json({ message: "Internal server error", status: false });
+    }
+}
+
 
 module.exports = {
-    checkDeliveryCode, handalGetPinCode, deliveryBoyDataSave, findAlldeliveryBoy, handalAssignDeliveryBoy
+    checkDeliveryCode, handalGetPinCode, deliveryBoyDataSave, findAlldeliveryBoy, handalAssignDeliveryBoy, handalGetDeliveryAddress
 }
