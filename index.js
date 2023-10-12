@@ -21,7 +21,7 @@ app.use(function (req, res, next) {
 
 // Allow requests from http://localhost:3000
 const corsOptions = {
-    origin: ['http://localhost:3000', 'http://192.168.1.5:3000', 'http://192.168.69.232:3000'],
+    origin: ['http://localhost:3000', 'http://192.168.1.5:3000', 'http://192.168.69.232:3000', 'http://bskart.com'],
     methods: ['GET', 'POST'], // Add any other methods you need to support
     allowedHeaders: ['Authorization', 'Content-Type'], // Add any other headers you want to allow
 };
@@ -56,7 +56,7 @@ SubCategory.belongsTo(Category,{
 //productFabric.sync({ force: true }) 
 
 const Product = require("./app/models/productModel");
-Product.sync({ alter: true })
+//Product.sync({ alter: true })
 
 const Quantity = require("./app/models/quantityModel");
 //Quantity.sync({ force: true })
@@ -162,7 +162,7 @@ orderModels.belongsTo(Address,{
 
 const orderItemModels = require("./app/models/orderItemModels");
 //orderItemModels.sync({ force: true })
-orderItemModels.sync({ alter: true })
+//orderItemModels.sync({ alter: true })
 
 orderModels.hasMany(orderItemModels,{
     foreignKey: 'order_id',
@@ -216,7 +216,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 //app.use("/new_address", userRouter)
 
 app.use("/api", router)
-
 app.listen(3000, () => {
-    console.log('Server started on port 3000');
+//app.listen(8081, () => {
+    console.log('Server started on port 8081');
   });
