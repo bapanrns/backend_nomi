@@ -14,7 +14,7 @@ const {handalSaveSubCategory, handalAllSubCategory, handalFindSubCategoryById, h
 // Product Fabric Controller
 const {handalSaveProductFabric, handalAllProductFabric, handalFindProductFabricById, handalDeleteProductFabricById, fetchFabricForFontend} = require('../controllers/productFabricController')
 // Product Controller
-const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalCreateGroupID, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock} = require('../controllers/productController')
+const {handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalCreateGroupID, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, getSareeListForHomePage1, allProductStock, saveProductStock, updateQuantity, deleteProductStock} = require('../controllers/productController')
 // Buy Controller
 const {SaveShopDetails, AllShopDetails, findShopDetailsByPK, deleteShopById, saveBuyProduct, AllBuyProductDetails, findBuyProductByPK, AllShopDetailsList, deleteBuyProductDetails } = require('../controllers/buyController')
 
@@ -93,7 +93,8 @@ router.route("/fetchItemTypeList").post(fetchItemTypeList)
 router.route("/getItemsList").post(getItemsList)
 router.route("/getItemsDetails").post(getItemsDetails)
 router.route("/getSimilarProducts").post(getSimilarProducts)
-router.route("/getSareeListForHomePage").post(getSareeListForHomePage)
+router.route("/getSareeListForHomePage").get(getSareeListForHomePage)
+router.route("/getSareeListForHomePage1").get(getSareeListForHomePage1)
 router.route("/allProductStock").post(checkAuth, checkUserRole(['adMin']), allProductStock)
 router.route("/saveProductStock").post(checkAuth, checkUserRole(['adMin']), saveProductStock)
 router.route("/updateQuantity").post(checkAuth, checkUserRole(['adMin']), updateQuantity)
