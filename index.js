@@ -20,6 +20,7 @@ app.use(function (req, res, next) {
 
 
 // Allow requests from http://localhost:3000
+/*
 const corsOptions = {
     origin: ['http://localhost:3000', 'http://192.168.1.5:3000', 'http://192.168.69.232:3000', 'http://localhost:3000/', 'http://bskart.com:80/', 'http://bskart.com/'],
     methods: ['GET', 'POST', 'post'], // Add any other methods you need to support
@@ -27,6 +28,23 @@ const corsOptions = {
 };
   
 app.use(cors(corsOptions));
+*/
+
+const allowedOrigins = ['http://bskart.com'];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
+
+
 
 global.tGlobalSecretKey = 'nomiMart';
 
