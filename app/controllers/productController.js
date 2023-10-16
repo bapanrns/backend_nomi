@@ -1705,137 +1705,6 @@ async function getSareeListForHomePage(req, res){
     }
 }
 
-
-async function getSareeListForHomePage1(req, res){
-    try {
-        let itemsListArray = [];
-        let itemListHash = {};
-
-
-        const categories = await ProductModel.findAll({
-            attributes: ['category_id'],
-            group: ['category_id'],
-        });
-
-
-    const productCounts = await ProductModel.findAll({
-        attributes: [
-            [sequelize.fn('COUNT', sequelize.col('Product.id')), 'productCount'], // Count the number of products and alias it as 'productCount'
-        ],
-        include: [
-            {
-                model: subCategoryModel,
-                as: 'SubCategory',
-            },
-        ],
-        group: ['SubCategory.id'], // Group by SubCategory.id
-        raw: true, // Return plain JSON objects
-    });
-
-
-    const productCountHash = productCounts.reduce((hash, item) => ({ ...hash, [item['SubCategory.id']]: item.productCount }), {});
-
-        for (const category of categories) {
-            const categoryId = category.getDataValue('category_id');
-
-            const groupedData = await ProductModel.findAll({
-            // group: ['Product.sub_category_id'],
-                where:{
-                    active_status: 1,
-                    category_id: categoryId
-                },
-                include: [{
-                    model: productImageModel,
-                    as: "Product_Image"
-                },{
-                    model: quantityModel,
-                    as: 'Quantity',
-                    where: {
-                        no_of_product: {
-                            [Op.gt]: 0,
-                        }
-                    }/*,
-                    order: [['no_of_product', 'DESC']]*/
-                },{
-                    model: categoryModel,
-                    as: 'Category'
-                },{
-                    model: subCategoryModel,
-                    as: 'SubCategory'
-                }],
-                /*order: [
-                    ['updatedAt', 'DESC'],
-                    [{ model: productImageModel, as: 'Product_Image' }, 'primary', 'DESC']
-                ]  */
-                group: ['group_id'],
-                order: sequelize.literal('RAND()'),
-                limit: 15,
-                
-            }).then((products) => {
-                products.forEach((product) => {
-                    console.log(product.category_id.toString() in itemListHash)
-                    if (product.category_id.toString() in itemListHash) {
-                    }else{
-                        itemListHash[product.category_id] = [];
-                    }
-                    let inner_hash = {
-                        item_id: product.id,
-                        product_offer_percentage: product.product_offer_percentage,
-                        product_name: product.product_name,
-                        company_name: product.company_name,
-                        more_color: productCountHash[product.SubCategory.id] -1
-                    }
-                    
-                    if(product.Product_Image !=undefined){
-                        //console.log("product.Product_Image", product.Product_Image);
-                        product.Product_Image.forEach((Product_Image, key) => {
-                            if(key == 0 || Product_Image.primary == 1){
-                                inner_hash['image_name'] = Product_Image.image_name
-                                inner_hash['primary'] = Product_Image.primary
-                            }
-                        })
-                    }
-        
-                    //console.log(inner_hash);
-        
-                    if(product.Quantity !=undefined){
-                    // console.log("product.Quantity", product.Quantity);
-                        product.Quantity.forEach((quantity) => {
-                            inner_hash['quantity'] = quantity.no_of_product
-                            inner_hash['price'] = quantity.sell_price
-                            
-                            let offerPrice = 0;
-                            if(product.product_offer_percentage > 0){
-                                offerPrice = quantity.sell_price * product.product_offer_percentage/100
-                            }
-                            inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
-
-                            let newPercentage = 0;
-                            if (product.product_offer_percentage > 0){
-                                offerPrice = quantity.sell_price * product.product_offer_percentage/100;
-                                newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
-                            }
-                            inner_hash['product_offer_percentage'] = newPercentage;
-                        })
-                    }
-
-                    inner_hash['category_name'] = product.Category.category_name;
-                    inner_hash['sub_category_id'] = product.SubCategory.id;
-                    inner_hash['sub_category_name'] = product.SubCategory.sub_category_name;
-        
-                    itemListHash[product.category_id].push(inner_hash);
-                    itemsListArray.push(inner_hash)
-                });
-            })
-        }
-    
-        return res.status(200).send(itemListHash);
-    } catch (error) {
-        console.error('Error retrieving grouped data:', error);
-        throw error;
-    }
-}
-
 async function getSareeListForHomePageOld(req, res){
     try {
         let itemsListArray = [];
@@ -1933,7 +1802,6 @@ async function getSareeListForHomePageOld(req, res){
         throw error;
     }
 }
-
 
 async function allProductStock(req, res){
     let stockArray = [];
@@ -2221,5 +2089,5 @@ async function deleteProductStock(req, res) {
   
  
 module.exports = {
-    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalCreateGroupID, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, getSareeListForHomePage1, allProductStock, saveProductStock, updateQuantity, deleteProductStock
+    handalSaveProduct, handalAllProduct, handalFindProductById, handalDeleteProductById, handalUpdateGroupId, handalCreateGroupID, handalDeleteProductImage, productAactiveInactive, findProductImage, setPrimaryImage, fetchItemTypeList, getItemsList, getItemsDetails, getSimilarProducts, getSareeListForHomePage, allProductStock, saveProductStock, updateQuantity, deleteProductStock
 }
