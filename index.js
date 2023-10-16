@@ -21,7 +21,7 @@ app.use(function (req, res, next) {
 
 // Allow requests from http://localhost:3000
 const corsOptions = {
-    origin: ['http://localhost:3000', 'http://192.168.1.5:3000', 'http://192.168.69.232:3000', 'http://localhost:3000/', 'http://bskart.com:3000/', 'http://bskart.com/'],
+    origin: ['http://localhost:3000', 'http://192.168.1.5:3000', 'http://192.168.69.232:3000', 'http://localhost:3000/', 'http://bskart.com:80/', 'http://bskart.com/'],
     methods: ['GET', 'POST', 'post'], // Add any other methods you need to support
     allowedHeaders: ['Authorization', 'Content-Type'], // Add any other headers you want to allow
 };
