@@ -1576,6 +1576,7 @@ async function getSimilarProducts(req, res){
 }
 
 async function getSareeListForHomePage(req, res){
+    console.error('getSareeListForHomePage');
     try {
         let itemsListArray = [];
         let itemListHash = {};
@@ -1587,22 +1588,22 @@ async function getSareeListForHomePage(req, res){
         });
 
 
-    const productCounts = await ProductModel.findAll({
-        attributes: [
-            [sequelize.fn('COUNT', sequelize.col('Product.id')), 'productCount'], // Count the number of products and alias it as 'productCount'
-        ],
-        include: [
-            {
-                model: subCategoryModel,
-                as: 'SubCategory',
-            },
-        ],
-        group: ['SubCategory.id'], // Group by SubCategory.id
-        raw: true, // Return plain JSON objects
-    });
+        const productCounts = await ProductModel.findAll({
+            attributes: [
+                [sequelize.fn('COUNT', sequelize.col('Product.id')), 'productCount'], // Count the number of products and alias it as 'productCount'
+            ],
+            include: [
+                {
+                    model: subCategoryModel,
+                    as: 'SubCategory',
+                },
+            ],
+            group: ['SubCategory.id'], // Group by SubCategory.id
+            raw: true, // Return plain JSON objects
+        });
 
 
-    const productCountHash = productCounts.reduce((hash, item) => ({ ...hash, [item['SubCategory.id']]: item.productCount }), {});
+        const productCountHash = productCounts.reduce((hash, item) => ({ ...hash, [item['SubCategory.id']]: item.productCount }), {});
 
         for (const category of categories) {
             const categoryId = category.getDataValue('category_id');
