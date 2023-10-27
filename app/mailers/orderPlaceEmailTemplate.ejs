@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Reset some default styles */
+    body, h1, p {
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Set a background color for the entire email */
+    body {
+      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Container to center the email content */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Heading styles */
+    h1 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Paragraph text styles */
+    p {
+      color: #555;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* Call to action button */
+    .btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #0070e0;
+      color: #ffffff;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .bskart{
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        background-color: #00cfff;
+        color: #ffffff;
+        font-size: 20px;
+        float: left;
+        margin-top: 5px;
+    }
+
+    .bskart a{
+        text-decoration: none;
+        color: #ffff;
+    }
+
+
+    .OrderItemDiv{
+      float: left;
+    }
+    
+    .orderStatusPending{
+      color: #cccccc;
+    }
+    .orderStatusConfirm{
+      color: green;
+    }
+    .orderStatusComplete{
+      color: #00cfff;
+    }
+    .orderStatusReturn{
+      color: orange;
+    }
+
+
+    .OrderWise {
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+
+    .orderItemListDiv {
+      float: left;
+    }
+
+    .OrderItemMainDiv {
+      width: 100%;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+    .OrderImage {
+      width: 192px;
+      height: 192px;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
+    .OrderItemDiv {
+      float: left;
+    }
+    /* Price details */
+    .orderPriceDetailsDiv{
+      float: left;
+      margin-top: 10px;
+    }
+    .PriceDetails{
+      border: 1px solid #ccc;
+      min-height: 300px;
+      border-radius: 5px;
+    }
+    .orderPriceDetails {
+      border-bottom: 1px solid #ccc;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .PriceDetailsItemCount {
+      padding: 10px;
+      height: 50px;
+    }
+    .PriceDetailsItemCount .PriceDetailsLeft {
+      float: left;
+    }
+    .PriceDetailsItemCount .PriceDetailsRight {
+      float: right;
+    }
+    .PriceDetailsDeliveryCharge .PriceDetailsRight {
+      float: right;
+    }
+    .PriceDetailsTotalAmount .PriceDetailsRight {
+      float: right;
+      font-size: 20px;
+      font-weight: bold;
+      color: #00cfff;
+    }
+
+    .PriceDetailsDeliveryCharge .PriceDetailsLeft {
+      float: left;
+    }
+
+    .PriceDetailsTotalAmount .PriceDetailsLeft {
+      float: left;
+      font-size: 20px;
+      font-weight: bold;
+      color: #00cfff;
+    }
+
+    .PriceDetailsDeliveryCharge {
+      padding: 10px;
+      height: 50px;
+      border-bottom: 1px solid #CCC;
+    }
+
+    .PriceDetailsTotalAmount {
+      padding: 30px 10px;
+      height: 90px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+<% 
+const orderPriceDetails = orderHash[1];
+const orderAddress = orderHash[2];
+const keys = Object.keys(orderHash[0]);
+  keys.forEach(product_id => { 
+    %>
+    <div class="OrderWise">
+      <div class='col-md-8 orderItemListDiv'>
+      <%
+      orderHash[0][product_id].forEach(obj => { 
+      %>
+    
+        <div class='OrderItemMainDiv' >
+          <div class='col-md-12'>
+              <div class='OrderItemDiv'>
+                  <img
+                      class='OrderImage'
+                      src="http://bskart.com/images/product/<%=obj.image_name%>"
+                      alt='No Image Found'
+                  />
+              </div>
+              <div class='OrderItemDiv'><%=obj.company_name%>&nbsp;&nbsp;</div><br></br>
+              <div class='OrderItemDiv'>Quantity: <%=obj.quantity%>&nbsp;&nbsp;</div><br></br>
+              <div class='OrderItemDiv'>Price: <%=obj.price%>&nbsp;&nbsp;</div><br></br>
+              <div class='OrderItemDiv'>Statue: <span class="orderStatus<%=obj.order_status%>"><%=obj.order_status%></span></div><br></br>
+          </div>
+        </div>
+    <% 
+    }); 
+    %>
+        </div>
+        <div class='col-md-4 orderPriceDetailsDiv'>
+          <div class='PriceDetails'>
+              <div class='orderPriceDetails'>Order Price Details</div>
+              <div class='PriceDetailsItemCount'>
+                  <div class='PriceDetailsLeft'>Items: <%=orderPriceDetails[product_id]['itemCount']%></div>
+                  <div class='PriceDetailsRight'>Rs: <%=orderPriceDetails[product_id]["total_price"]%>/-</div>
+              </div>
+              <div class='PriceDetailsDeliveryCharge'>
+                  <div class='PriceDetailsLeft'>Delivery Charges: </div>
+                  <div class='PriceDetailsRight'>Rs: <%=orderPriceDetails[product_id]["deliveryCharge"]%>/-</div>
+              </div>
+              <div class='PriceDetailsTotalAmount'>
+                  <div class='PriceDetailsLeft'>Total Amount: </div>
+                  <div class='PriceDetailsRight'>Rs: <%=orderPriceDetails[product_id]["grossTotal"]%>/-</div>
+              </div>
+              <div style="padding-left: 10px; padding-right: 10px;">
+                  <div class='PriceDetailsLeft' style="font-weight: bold; color: rgb(0, 207, 255);">Delivary Address: </div>
+                  <%=orderAddress[product_id][0]["name"]%>, <%=orderAddress[product_id][0]["village"]%>, <%=orderAddress[product_id][0]["landmark"]%>, <%=orderAddress[product_id][0]["pincode"]%>, <%=orderAddress[product_id][0]["mobile_no"]%> - <%=orderAddress[product_id][0]["alternative_mobile_no"]%>
+              </div>
+          </div>
+      </div>
+    </div>
+<% 
+  }); 
+%>
+    <div class="bskart"><a href="http://bskart.com/my-order" >Order Details</a></div>
+  </div>
+</body>
+</html>

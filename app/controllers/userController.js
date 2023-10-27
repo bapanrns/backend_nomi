@@ -8,6 +8,10 @@ const cartModel = require("../models/cartModels");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const ejs = require('ejs');
+const fs = require('fs');
+const path = require('path');
+
 
 //const { transporter } = require('../mailers/user_mailer');
 const { transporter } = require('../mailers/user_mailer');
@@ -70,23 +74,27 @@ async function saveUserRecord(req, res){
         });
         if(newPass.id > 0){
 
+            // Read the email template
+            const filePath = path.join(__dirname, '../mailers/signUpEmailTemplate.ejs');
+            const emailTemplate = fs.readFileSync(filePath, "utf8");
+
+            // Render the email template with dynamic data
+            const renderedEmail = ejs.render(emailTemplate, { });
+
             var mailOptions = {
                 from: 'bapan.rns@gmail.com',
                 to: req.body.email_address,
-                subject: 'Welcome to our Website',
-                html: '<p>Hi </p><p>You are successfully registered in our system.</p>'
-              };
+                subject: 'Welcome to BsKart!',
+                html: renderedEmail
+            };
       
-              transporter.sendMail(mailOptions, function(error, info){
+            transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
                   console.log(error);
                 } else {
                   console.log('Email sent: ' + info.response);
                 }
-              });
-
-
-
+            });
             return res.status(200).send({succ: 1, message: "Signup Successfully."});
         }
     } catch (error) {
@@ -233,6 +241,12 @@ function generateOTP() {
 async function forgotPassword(req, res){
     let returnMessage = {messageStatus: 1, message: ""};
     let newOtp = "";
+
+
+    // Read the email template
+    const filePath = path.join(__dirname, '../mailers/forgotPasswordEmailTemplate.ejs');
+    const emailTemplate = fs.readFileSync(filePath, "utf8");
+    
     await UserModel.findOne({
         where: { email: req.body.email },
     })
@@ -248,11 +262,13 @@ async function forgotPassword(req, res){
     })
     .then(updatedUser => {
         if (updatedUser) {
+            // Render the email template with dynamic data
+            const renderedEmail = ejs.render(emailTemplate, { otp: newOtp });
             var mailOptions = {
                 from: 'bapan.rns@gmail.com',
                 to: req.body.email,
-                subject: 'BsKart.com New OTP',
-                html: `Your OTP code is: ${newOtp}`
+                subject: 'Password Reset Request',
+                html: renderedEmail
             };
       
             transporter.sendMail(mailOptions, function(error, info){
@@ -297,11 +313,19 @@ async function setNewPassword(req, res){
     })
     .then(updatedUser => {
         if (updatedUser) {
+
+            // Read the email template
+            const filePath = path.join(__dirname, '../mailers/passwordChangeEmailTemplate.ejs');
+            const emailTemplate = fs.readFileSync(filePath, "utf8");
+
+            // Render the email template with dynamic data
+            const renderedEmail = ejs.render(emailTemplate, { });
+
             var mailOptions = {
                 from: 'bapan.rns@gmail.com',
                 to: req.body.email,
-                subject: 'BsKart.com Password Change',
-                html: `Password changed successfully`
+                subject: 'Password Changed',
+                html: renderedEmail
             };
       
             transporter.sendMail(mailOptions, function(error, info){

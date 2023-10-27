@@ -11,6 +11,15 @@ const addressModel = require('../models/addressModel');
 const productImageModel = require('../models/productImageModel');
 const userAccountDetails = require('../models/userAccountDetails');
 const deliveryBoyModel = require("../models/deliveryBoyModel");
+const UserModel = require("../models/userModels");
+
+
+const ejs = require('ejs');
+const fs = require('fs');
+const path = require('path');
+
+
+const { transporter } = require('../mailers/user_mailer');
 
 
 /*
@@ -93,6 +102,15 @@ async function continueToBuy(req, res) {
         whereClause['user_id'] = decodedToken.id;
         whereClause[Op.or] = [];
         let itemFoundFlag = false;
+        let orderId = 0;
+
+        const userObj = await UserModel.findOne({
+            where:{
+                id: decodedToken.id
+            }
+        });
+
+        console.log("---------------------------------------------: ", userObj.email);
 
         for (let i = 0; i < itemsArray.length; i++) {
             let product_id_size = itemsArray[i].split("@");
@@ -132,6 +150,7 @@ async function continueToBuy(req, res) {
                         outOfStockItemArray.push(cartsObj.product_id + "@" + cartsObj.size);
                     } else {
                         buyItemArray.push(cartsObj.product_id + "@" + cartsObj.size);
+                        orderId = orderObj.id;
                     }
 
                     //console.log("outOfStockItemArray", outOfStockItemArray);
@@ -142,6 +161,62 @@ async function continueToBuy(req, res) {
                     }
                 }
             }
+        }
+
+        if(buyItemArray.length > 0 && orderId > 0){
+            // Send Confirm Email
+            const orderItem = await OrderModels.findAll({
+                where: {
+                    id: orderId
+                },
+                order: [['id', 'DESC']],
+                required: true,
+                include: [
+                    {
+                        model: OrderItemModels,
+                        as: 'OrderItem',
+                        where: {}
+                    }
+                ]
+            });
+            
+            const orderHash = await fetchOrderItemDetails(orderItem);
+            // Read the email template
+            const filePath = path.join(__dirname, '../mailers/orderPlaceEmailTemplate.ejs');
+            const emailTemplate = fs.readFileSync(filePath, "utf8");
+
+            // Render the email template with dynamic data
+            const renderedEmail = ejs.render(emailTemplate, { orderHash });
+            
+            var mailOptions1 = {
+                from: 'bapan.rns@gmail.com',
+                to: userObj.email,
+                subject: 'Order Confirmation From BsKart!',
+                html: renderedEmail
+            };
+            // For Admin
+            var mailOptions = {
+                from: 'bapan.rns@gmail.com',
+                to: 'bapan.rns@gmail.com',
+                subject: 'New Order From BsKart!',
+                html: renderedEmail
+            };
+      
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
+
+            transporter.sendMail(mailOptions1, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
         }
 
         return res.status(200).send({
@@ -275,7 +350,6 @@ async function getOrderData(req, res){
         where: {
             customer_id: decodedToken.id
         },
-        order: [['id', 'DESC']],
         required: true,
         include: [
             {
@@ -283,7 +357,8 @@ async function getOrderData(req, res){
                 as: 'OrderItem',
                 where: {}
             }
-        ]
+        ],
+        order: [['id', 'DESC']]
     });
     
     const orderHash = await fetchOrderItemDetails(orderItem);
@@ -370,7 +445,6 @@ async function fetchOrderItemDetails(orderItem){
             orderItemAddress[orderId] = await getDeliveryAddress(orderObj.delivery_address_id);
         }
     }
-
     return [orderHash, orderPriceDetails, orderItemAddress];
 }
 
@@ -408,16 +482,74 @@ async function productDetails(product_id){
 }
 
 async function cancelOrderItem(req, res){
-    const upadte = await OrderItemModels.update({order_status: "Cancel"}, {
+    const token = req.headers.authorization;
+    const decodedToken = jwt.verify(token, tGlobalSecretKey);
+    const upadte = await OrderItemModels.update(
+        {order_status: "Cancel"}, {
         where: {
             id: req.body.order_item_id, // Specify the condition to match (e.g., id = 1)
             order_status:{
                 [Op.in]: ["Pending", "Confirm"]
             }
-        }
+        },
+        include: [
+            {
+                model: OrderModels,
+                where: { customer_id: decodedToken.id},
+            },
+        ],
     });
     orderItemQuentityUpdate(req.body.order_item_id);
-    updateOrderPrice(req.body.order_id)
+    updateOrderPrice(req.body.order_id);
+
+    let productObj = await productDetails(req.body.pid);
+    productObj["order_status"] = "Cancel";
+    productObj["linkUrl"] = "http://bskart.com";
+    productObj["linkText"] = "Continue To Buy";
+
+    // Read the email template
+    const filePath = path.join(__dirname, '../mailers/orderCancelEmailTemplate.ejs');
+    const emailTemplate = fs.readFileSync(filePath, "utf8");
+
+    // Render the email template with dynamic data
+    const renderedEmail = ejs.render(emailTemplate, { productObj });
+
+    const userObj = await UserModel.findOne({
+        where:{
+            id: decodedToken.id
+        }
+    });
+    
+    var mailOptions1 = {
+        from: 'bapan.rns@gmail.com',
+        to: userObj.email,
+        subject: 'Order item cancellation successfully.',
+        html: renderedEmail
+    };
+    // For Admin
+    var mailOptions = {
+        from: 'bapan.rns@gmail.com',
+        to: 'bapan.rns@gmail.com',
+        subject: 'Order item cancellation From BsKart!',
+        html: renderedEmail
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+    });
+
+    transporter.sendMail(mailOptions1, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+    });
+
     return res.status(200).send(upadte);
 }
 
@@ -568,7 +700,7 @@ async function allOrderDetails(req, res) {
 
       const results = await sequelize.query(`SELECT o.id AS 'orderId', p.id AS 'pId', p.product_name, oi.id AS 'orderItemId', oi.order_status, oi.price, oi.quantity, oi.size, o.delivery_pincode, o.total_amount, oi.order_status, oi.order_message, oi.delivery_boy_id, o.delivery_address_id, o.createdAt FROM Orders o, Products p, order_Items oi WHERE oi.product_id = p.id AND o.id = oi.order_id 
        ${whereClase}
-      ORDER BY o.id, o.delivery_pincode`);
+      ORDER BY o.id DESC, o.delivery_pincode`);
   
         // Handle the results here
         const orderIDs = results[0].map(result => result['pId']);
@@ -636,7 +768,7 @@ async function getProductImage(pIds){
 async function handalUpdateOrderStatus(req, res) {
     //console.log("handalUpdateOrderStatus");
     try {
-        const { OrderStatus, orderMessage, id } = req.body;
+        const { OrderStatus, orderMessage, id, orderId } = req.body;
 
        //console.log(req.body);
 /*
@@ -666,14 +798,18 @@ async function handalUpdateOrderStatus(req, res) {
             where: { id }
         });
 
-        if(OrderStatus == "Reject" && ["We are not delivering to your address", "Your address information is incorrect"].includes(orderMessage)){
+       /* if(OrderStatus == "Reject" && ["We are not delivering to your address", "Your address information is incorrect"].includes(orderMessage)){
             // Call with order_item_id
             orderItemQuentityUpdate(req.body.id);
             // Call with order_id
             updateOrderPrice(req.body.orderId)
-        }
+        }*/
 
         if (updatedRows > 0) {
+            if(["Reject", "Return Accept"].includes(OrderStatus)){
+                orderItemQuentityUpdate(id);
+                updateOrderPrice(req.body.orderId)
+            }
             return res.status(200).json({ message: "Update successful", status: true });
         } else {
             return res.status(200).json({ message: "No matching record found for the given id.", status: false });
