@@ -189,14 +189,14 @@ async function continueToBuy(req, res) {
             const renderedEmail = ejs.render(emailTemplate, { orderHash });
             
             var mailOptions1 = {
-                from: 'bapan.rns@gmail.com',
+                from: 'bskart.nm@gmail.com',
                 to: userObj.email,
                 subject: 'Order Confirmation From BsKart!',
                 html: renderedEmail
             };
             // For Admin
             var mailOptions = {
-                from: 'bapan.rns@gmail.com',
+                from: 'bskart.nm@gmail.com',
                 to: 'bapan.rns@gmail.com',
                 subject: 'New Order From BsKart!',
                 html: renderedEmail
@@ -521,14 +521,14 @@ async function cancelOrderItem(req, res){
     });
     
     var mailOptions1 = {
-        from: 'bapan.rns@gmail.com',
+        from: 'bskart.nm@gmail.com',
         to: userObj.email,
         subject: 'Order item cancellation successfully.',
         html: renderedEmail
     };
     // For Admin
     var mailOptions = {
-        from: 'bapan.rns@gmail.com',
+        from: 'bskart.nm@gmail.com',
         to: 'bapan.rns@gmail.com',
         subject: 'Order item cancellation From BsKart!',
         html: renderedEmail

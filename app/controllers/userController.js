@@ -82,7 +82,7 @@ async function saveUserRecord(req, res){
             const renderedEmail = ejs.render(emailTemplate, { });
 
             var mailOptions = {
-                from: 'bapan.rns@gmail.com',
+                from: 'bskart.nm@gmail.com',
                 to: req.body.email_address,
                 subject: 'Welcome to BsKart!',
                 html: renderedEmail
@@ -265,7 +265,7 @@ async function forgotPassword(req, res){
             // Render the email template with dynamic data
             const renderedEmail = ejs.render(emailTemplate, { otp: newOtp });
             var mailOptions = {
-                from: 'bapan.rns@gmail.com',
+                from: 'bskart.nm@gmail.com',
                 to: req.body.email,
                 subject: 'Password Reset Request',
                 html: renderedEmail
@@ -322,7 +322,7 @@ async function setNewPassword(req, res){
             const renderedEmail = ejs.render(emailTemplate, { });
 
             var mailOptions = {
-                from: 'bapan.rns@gmail.com',
+                from: 'bskart.nm@gmail.com',
                 to: req.body.email,
                 subject: 'Password Changed',
                 html: renderedEmail
