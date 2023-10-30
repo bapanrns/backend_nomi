@@ -12,6 +12,8 @@ const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
 
+const Nodelogger = require("../loger/winstonlogger")
+
 
 //const { transporter } = require('../mailers/user_mailer');
 const { transporter } = require('../mailers/user_mailer');
@@ -239,54 +241,62 @@ function generateOTP() {
 }
 
 async function forgotPassword(req, res){
-    let returnMessage = {messageStatus: 1, message: ""};
-    let newOtp = "";
+    Nodelogger.info("forgotPassword: "+path.basename(__filename));
+    Nodelogger.info(req.body);
+    try{
+        let returnMessage = {messageStatus: 1, message: ""};
+        let newOtp = "";
 
 
-    // Read the email template
-    const filePath = path.join(__dirname, '../mailers/forgotPasswordEmailTemplate.ejs');
-    const emailTemplate = fs.readFileSync(filePath, "utf8");
-    
-    await UserModel.findOne({
-        where: { email: req.body.email },
-    })
-    .then(user => {
-        if (user) {
-            newOtp = generateOTP();
-            user.last_otp = newOtp; // Update the firstName
-            return user.save(); // Save the changes to the database
-        } else {
-            returnMessage["message"] = 'Email address not found';
-            returnMessage["messageStatus"] = 1;
-        }
-    })
-    .then(updatedUser => {
-        if (updatedUser) {
-            // Render the email template with dynamic data
-            const renderedEmail = ejs.render(emailTemplate, { otp: newOtp });
-            var mailOptions = {
-                from: 'bskart.nm@gmail.com',
-                to: req.body.email,
-                subject: 'Password Reset Request',
-                html: renderedEmail
-            };
-      
-            transporter.sendMail(mailOptions, function(error, info){
-                if (error) {
-                  console.log(error);
-                } else {
-                  console.log('Email sent: ' + info.response);
-                }
-            });
+        // Read the email template
+        const filePath = path.join(__dirname, '../mailers/forgotPasswordEmailTemplate.ejs');
+        const emailTemplate = fs.readFileSync(filePath, "utf8");
+        
+        await UserModel.findOne({
+            where: { email: req.body.email },
+        })
+        .then(user => {
+            if (user) {
+                newOtp = generateOTP();
+                user.last_otp = newOtp; // Update the firstName
+                return user.save(); // Save the changes to the database
+            } else {
+                returnMessage["message"] = 'Email address not found';
+                returnMessage["messageStatus"] = 1;
+            }
+        })
+        .then(updatedUser => {
+            if (updatedUser) {
+                // Render the email template with dynamic data
+                const renderedEmail = ejs.render(emailTemplate, { otp: newOtp });
+                var mailOptions = {
+                    from: 'bskart.nm@gmail.com',
+                    to: req.body.email,
+                    subject: 'Password Reset Request',
+                    html: renderedEmail
+                };
+        
+                transporter.sendMail(mailOptions, function(error, info){
+                    if (error) {
+                    console.log(error);
+                    } else {
+                    console.log('Email sent: ' + info.response);
+                    }
+                });
 
-            returnMessage["message"] = 'An OTP has been sent to your email address successfully.';
-            returnMessage["messageStatus"] = 0;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-    return res.status(200).send(returnMessage);
+                returnMessage["message"] = 'An OTP has been sent to your email address successfully.';
+                returnMessage["messageStatus"] = 0;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+        return res.status(200).send(returnMessage);
+    }catch(error){
+        Nodelogger.info("forgotPassword: "+path.basename(__filename));
+        Nodelogger.info(error);
+        return res.status(500).send("Error");
+    }
 }
 
 async function setNewPassword(req, res){
