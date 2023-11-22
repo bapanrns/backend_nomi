@@ -528,7 +528,6 @@ async function updateProductQuantity(id, updateHash){
         // Handle any errors here
         Nodelogger.error("updateProductQuantity: "+path.basename(__filename));
         Nodelogger.error(error);
-        Nodelogger.error(error);
     }
 }
 
@@ -986,7 +985,7 @@ async function handalCreateGroupID(req, res){
 
 async function findProductSubCategory(product_ids){
     Nodelogger.info("findProductSubCategory: "+path.basename(__filename));
-    Nodelogger.info("product_ids: ", product_ids);
+    Nodelogger.info("product_ids: "+ product_ids);
     try{
         const product = await ProductModel.findAll({
             where: {

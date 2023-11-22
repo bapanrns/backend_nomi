@@ -7,32 +7,43 @@ const deliveryBoyModel = require("../models/deliveryBoyModel");
 const Nodelogger = require("../loger/winstonlogger")
 const OrderItemModels = require("../models/orderItemModels");
 const Address = require("../models/addressModel");
+const path = require('path');
 
 async function checkDeliveryCode(req, res){
-    let returnMessage = "";
-    if(req.body.deliveryCode !=""){
-        const pincodeObj = await pincodeModel.findOne({
-            where: {
-                code: req.body.deliveryCode,
-                active_status: 1
-            }
-        }).then(resultObj => {
-            console.log(resultObj)
-            if(resultObj){
-                returnMessage = "Valid code";
-            }else{
-                returnMessage = "Not Valid code";
-                newPincodeModel.create({code: req.body.deliveryCode});
-            }
-        })
-    }else{
-        returnMessage = "Accept only numbers with 6 digits.";
+    Nodelogger.info("checkDeliveryCode: "+path.basename(__filename));
+    Nodelogger.info(req.body);
+    try {
+        let returnMessage = "";
+        if(req.body.deliveryCode !=""){
+            const pincodeObj = await pincodeModel.findOne({
+                where: {
+                    code: req.body.deliveryCode,
+                    active_status: 1
+                }
+            }).then(resultObj => {
+                console.log(resultObj)
+                if(resultObj){
+                    returnMessage = "Valid code";
+                }else{
+                    returnMessage = "Not Valid code";
+                    newPincodeModel.create({code: req.body.deliveryCode});
+                }
+            })
+        }else{
+            Nodelogger.warn("Accept only numbers with 6 digits.: "+path.basename(__filename));
+            returnMessage = "Accept only numbers with 6 digits.";
+        }
+        return res.status(200).send(returnMessage);
+    } catch (error) {
+        Nodelogger.error("checkDeliveryCode: "+path.basename(__filename));
+        Nodelogger.error(error);
+        return res.status(200).send("Error");
     }
-    console.log(returnMessage);
-    return res.status(200).send(returnMessage);
 }
 
 async function handalGetPinCode(req, res) {
+    Nodelogger.info("handalGetPinCode: "+path.basename(__filename));
+    Nodelogger.info(req.body);
     try {
         const groupedData = await pincodeModel.findAll({
             where: { active_status: 1 },
@@ -41,11 +52,15 @@ async function handalGetPinCode(req, res) {
         return res.status(200).send({ pinCodes: pincode });
     } catch (error) {
         console.error('Error fetching pin codes:', error);
+        Nodelogger.error("handalGetPinCode: "+path.basename(__filename));
+        Nodelogger.error(error);
         return res.status(500).send({ error: 'Internal Server Error' });
     }
 }
 
 async function deliveryBoyDataSave(req, res) {
+    Nodelogger.info("deliveryBoyDataSave: "+path.basename(__filename));
+    Nodelogger.info(req.body);
     // Initialize variables to store messages and request data
     let returnMessage = "";
     let id = req.body.id;
@@ -74,15 +89,16 @@ async function deliveryBoyDataSave(req, res) {
     } catch (error) {
         // Handle any errors that occur during the database operation
         console.error('Error while saving delivery boy data:', error);
-
-        Nodelogger.info(error);
-
+        Nodelogger.error("deliveryBoyDataSave: "+path.basename(__filename));
+        Nodelogger.error(error);
         // Respond with an error message and a flag indicating failure
         return res.status(500).send({ errorMessage: 'Failed to save data', flag: false });
     }
 }
 
 async function findAlldeliveryBoy(req, res){
+    Nodelogger.info("findAlldeliveryBoy: "+path.basename(__filename));
+    Nodelogger.info(req.body);
     try {
         let orderStatus = "";
         const results = await deliveryBoyModel.findAll();
@@ -101,14 +117,17 @@ async function findAlldeliveryBoy(req, res){
   
         
         return res.status(200).send(orderArray);
-      } catch (error) {
+    } catch (error) {
         // Handle any errors here
-        console.error(error);
+        Nodelogger.error("findAlldeliveryBoy: "+path.basename(__filename));
+        Nodelogger.error(error);
         return res.status(500).send('Error executing the query.');
-      }
+    }
 }
 
 async function handalAssignDeliveryBoy(req, res){
+    Nodelogger.info("handalAssignDeliveryBoy: "+path.basename(__filename));
+    Nodelogger.info(req.body);
     try {
         const { DeliveryBoyId, orderMessage, id } = req.body;
 
@@ -144,12 +163,15 @@ async function handalAssignDeliveryBoy(req, res){
             return res.status(200).json({ message: "No matching record found for the given id.", status: false });
         }
     } catch (error) {
-        console.error("Error updating order:", error);
+        Nodelogger.error("handalAssignDeliveryBoy: "+path.basename(__filename));
+        Nodelogger.error(error);
         return res.status(200).json({ message: "Internal server error", status: false });
     }
 }
 
 async function handalGetDeliveryAddress(req, res){
+    Nodelogger.info("handalGetDeliveryAddress: "+path.basename(__filename));
+    Nodelogger.info(req.body);
     try {
         let addressObj = await Address.findOne({
             where:{
@@ -158,7 +180,8 @@ async function handalGetDeliveryAddress(req, res){
         });
         return res.status(200).send(addressObj);
     }catch(error){
-        console.error("Error updating order:", error);
+        Nodelogger.error("handalGetDeliveryAddress: "+path.basename(__filename));
+        Nodelogger.error(error);
         return res.status(200).json({ message: "Internal server error", status: false });
     }
 }
