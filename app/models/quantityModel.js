@@ -34,6 +34,10 @@ Quantity.init({
   sell_price: {
     type: DataTypes.FLOAT,
     allowNull: false
+  },
+  mrp_price: {
+    type: DataTypes.FLOAT,
+    allowNull: true
   }
 }, {
   // Other model options go here

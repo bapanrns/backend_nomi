@@ -182,6 +182,7 @@ const userAccountDetails = require("./app/models/userAccountDetails");
 
 const stockModel = require("./app/models/stockModel");
 //stockModel.sync({ force: true })
+//stockModel.sync({ alter: true })
 /*
 Product.hasMany(stockModel,{
     foreignKey: 'product_id',
@@ -217,6 +218,6 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/api", router)
 //app.listen(8081, () => {
-app.listen(3000, () => {
+app.listen(30000, () => {
     console.log('Server started on port 8081');
   });

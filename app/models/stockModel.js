@@ -43,6 +43,10 @@ Stock.init({
   bill_id: {
     type: DataTypes.INTEGER,
     allowNull: true,
+  },
+  mrp_price: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
   }
 
 }, {

@@ -74,7 +74,8 @@ async function handalSaveProduct(req, res){
                                         req.body.quantity,
                                         size="", 
                                         req.body.quantity_buy_price, 
-                                        req.body.quantity_selling_price
+                                        req.body.quantity_selling_price,
+                                        req.body.quantity_mrp_price
                                         );
 
             if(req.body.quantity_id > 0 ){
@@ -90,7 +91,8 @@ async function handalSaveProduct(req, res){
                                         req.body.quantityXs,
                                         size="XS", 
                                         req.body.quantityXs_buy_price, 
-                                        req.body.quantityXs_selling_price
+                                        req.body.quantityXs_selling_price,
+                                        req.body.quantityXs_mrp_price
                                         );
 
             if(req.body.quantity_Xs_id > 0 ){
@@ -106,7 +108,8 @@ async function handalSaveProduct(req, res){
                                         req.body.quantityS,
                                         size="S", 
                                         req.body.quantityS_buy_price, 
-                                        req.body.quantityS_selling_price
+                                        req.body.quantityS_selling_price,
+                                        req.body.quantityS_mrp_price
                                         );
 
             if(req.body.quantity_S_id > 0 ){
@@ -122,7 +125,8 @@ async function handalSaveProduct(req, res){
                                         req.body.quantityL,
                                         size="L", 
                                         req.body.quantityL_buy_price, 
-                                        req.body.quantityL_selling_price
+                                        req.body.quantityL_selling_price,
+                                        req.body.quantityL_mrp_price
                                         );
 
             if(req.body.quantity_L_id > 0 ){
@@ -138,7 +142,8 @@ async function handalSaveProduct(req, res){
                                         req.body.quantityM,
                                         size="M", 
                                         req.body.quantityM_buy_price, 
-                                        req.body.quantityM_selling_price
+                                        req.body.quantityM_selling_price,
+                                        req.body.quantityM_mrp_price
                                         );
 
             if(req.body.quantity_M_id > 0 ){
@@ -154,7 +159,8 @@ async function handalSaveProduct(req, res){
                                         req.body.quantityXl,
                                         size="XL", 
                                         req.body.quantityXl_buy_price, 
-                                        req.body.quantityXl_selling_price
+                                        req.body.quantityXl_selling_price,
+                                        req.body.quantityXl_mrp_price
                                         );
 
             if(req.body.quantity_Xl_id > 0 ){
@@ -170,7 +176,8 @@ async function handalSaveProduct(req, res){
                                         req.body.quantity2Xl,
                                         size="2XL", 
                                         req.body.quantity2Xl_buy_price, 
-                                        req.body.quantity2Xl_selling_price
+                                        req.body.quantity2Xl_selling_price,
+                                        req.body.quantity2Xl_mrp_price
                                         );
 
             if(req.body.quantity_2Xl_id > 0 ){
@@ -204,7 +211,8 @@ async function handalSaveProduct(req, res){
                             no_of_product: req.body.quantity,
                             size: "",
                             buy_price: req.body.quantity_buy_price,
-                            sell_price: req.body.quantity_selling_price
+                            sell_price: req.body.quantity_selling_price,
+                            mrp_price: req.body.quantity_mrp_price
                         }
                     )
 
@@ -215,7 +223,8 @@ async function handalSaveProduct(req, res){
                         size: "",
                         buy_price: req.body.quantity_buy_price,
                         sell_price: req.body.quantity_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantity_mrp_price
                     });
                 }
                 if (req.body.quantityXs > 0){
@@ -225,7 +234,8 @@ async function handalSaveProduct(req, res){
                             no_of_product: req.body.quantityXs,
                             size: "XS",
                             buy_price: req.body.quantityXs_buy_price,
-                            sell_price: req.body.quantityXs_selling_price
+                            sell_price: req.body.quantityXs_selling_price,
+                            mrp_price: req.body.quantityXs_mrp_price
                         }
                     )
 
@@ -236,7 +246,8 @@ async function handalSaveProduct(req, res){
                         size: "XS",
                         buy_price: req.body.quantityXs_buy_price,
                         sell_price: req.body.quantityXs_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantityXs_mrp_price
                     });
                 }
                 if (req.body.quantityS > 0){
@@ -246,7 +257,8 @@ async function handalSaveProduct(req, res){
                             no_of_product: req.body.quantityS,
                             size: "S",
                             buy_price: req.body.quantityS_buy_price,
-                            sell_price: req.body.quantityS_selling_price
+                            sell_price: req.body.quantityS_selling_price,
+                            mrp_price: req.body.quantityS_mrp_price
                         }
                     )
 
@@ -258,7 +270,8 @@ async function handalSaveProduct(req, res){
                         size: "S",
                         buy_price: req.body.quantityS_buy_price,
                         sell_price: req.body.quantityS_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantityS_mrp_price
                     });
                 }
                 if (req.body.quantityL > 0){
@@ -268,7 +281,8 @@ async function handalSaveProduct(req, res){
                             no_of_product: req.body.quantityL,
                             size: "L",
                             buy_price: req.body.quantityL_buy_price,
-                            sell_price: req.body.quantityL_selling_price
+                            sell_price: req.body.quantityL_selling_price,
+                            mrp_price: req.body.quantityL_mrp_price
                         }
                     )
 
@@ -280,7 +294,8 @@ async function handalSaveProduct(req, res){
                         size: "L",
                         buy_price: req.body.quantityL_buy_price,
                         sell_price: req.body.quantityL_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantityL_mrp_price
                     });
                 }
                 if (req.body.quantityM > 0){
@@ -290,7 +305,8 @@ async function handalSaveProduct(req, res){
                             no_of_product: req.body.quantityM,
                             size: "M",
                             buy_price: req.body.quantityM_buy_price,
-                            sell_price: req.body.quantityM_selling_price
+                            sell_price: req.body.quantityM_selling_price,
+                            mrp_price: req.body.quantityM_mrp_price
                         }
                     )
 
@@ -302,7 +318,8 @@ async function handalSaveProduct(req, res){
                         size: "M",
                         buy_price: req.body.quantityM_buy_price,
                         sell_price: req.body.quantityM_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantityM_mrp_price
                     });
                 }
                 if (req.body.quantityXl > 0){
@@ -312,7 +329,8 @@ async function handalSaveProduct(req, res){
                             no_of_product: req.body.quantityXl,
                             size: "XL",
                             buy_price: req.body.quantityXl_buy_price,
-                            sell_price: req.body.quantityXl_selling_price
+                            sell_price: req.body.quantityXl_selling_price,
+                            mrp_price: req.body.quantityXl_mrp_price
                         }
                     )
 
@@ -324,7 +342,8 @@ async function handalSaveProduct(req, res){
                         size: "XL",
                         buy_price: req.body.quantityXl_buy_price,
                         sell_price: req.body.quantityXl_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantityXl_mrp_price
                     });
                 }
 
@@ -333,7 +352,8 @@ async function handalSaveProduct(req, res){
                                                         req.body.quantity2Xl,
                                                         size="2XL", 
                                                         req.body.quantity2Xl_buy_price, 
-                                                        req.body.quantity2Xl_selling_price
+                                                        req.body.quantity2Xl_selling_price,
+                                                        req.body.quantity2Xl_mrp_price
                                                         )
                                                     );
 
@@ -345,7 +365,8 @@ async function handalSaveProduct(req, res){
                         size: "2XL",
                         buy_price: req.body.quantity2Xl_buy_price,
                         sell_price: req.body.quantity2Xl_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantity2Xl_mrp_price
                     });
                 }
 
@@ -354,7 +375,8 @@ async function handalSaveProduct(req, res){
                                                         req.body.quantity32,
                                                         size="32", 
                                                         req.body.quantity32_buy_price, 
-                                                        req.body.quantity32_selling_price
+                                                        req.body.quantity32_selling_price,
+                                                        req.body.quantity32_mrp_price
                                                         )
                                                     );
 
@@ -366,7 +388,8 @@ async function handalSaveProduct(req, res){
                         size: "32",
                         buy_price: req.body.quantity32_buy_price,
                         sell_price: req.body.quantity32_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantity32_mrp_price
                     });
                 }
                 
@@ -375,7 +398,8 @@ async function handalSaveProduct(req, res){
                                                         req.body.quantity34,
                                                         size="34", 
                                                         req.body.quantity34_buy_price, 
-                                                        req.body.quantity34_selling_price
+                                                        req.body.quantity34_selling_price,
+                                                        req.body.quantity34_mrp_price
                                                         )
                                                     );
 
@@ -387,7 +411,8 @@ async function handalSaveProduct(req, res){
                         size: "34",
                         buy_price: req.body.quantity34_buy_price,
                         sell_price: req.body.quantity34_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantity34_mrp_price
                     });
                 }
                 
@@ -396,7 +421,8 @@ async function handalSaveProduct(req, res){
                                                         req.body.quantity36,
                                                         size="36", 
                                                         req.body.quantity36_buy_price, 
-                                                        req.body.quantity36_selling_price
+                                                        req.body.quantity36_selling_price,
+                                                        req.body.quantity36_mrp_price
                                                         )
                                                     );
 
@@ -408,7 +434,8 @@ async function handalSaveProduct(req, res){
                         size: "36",
                         buy_price: req.body.quantity36_buy_price,
                         sell_price: req.body.quantity36_selling_price,
-                        status: "Complete"
+                        status: "Complete",
+                        mrp_price: req.body.quantity36_mrp_price
                     });
                 }
 
@@ -498,7 +525,7 @@ async function handalSaveProduct(req, res){
     }
 }
 
-async function createQuantityHash(id="", no_of_product=0, size="", buy_price=0, sell_price=0){
+async function createQuantityHash(id="", no_of_product=0, size="", buy_price=0, sell_price=0, mrp_price=0){
     Nodelogger.info("createQuantityHash: "+path.basename(__filename));
     Nodelogger.info("id: "+id+"no_of_product: "+no_of_product+"size: "+size+"buy_price: "+buy_price+"sell_price: "+sell_price);
     const inner_hash = {
@@ -506,7 +533,8 @@ async function createQuantityHash(id="", no_of_product=0, size="", buy_price=0, 
         no_of_product: no_of_product,
         size: size,
         buy_price: buy_price,
-        sell_price: sell_price
+        sell_price: sell_price,
+        mrp_price: mrp_price
     }
     return inner_hash;
 }
@@ -664,7 +692,6 @@ async function getStock(product_id){
     Nodelogger.info("getStock: "+path.basename(__filename));
     Nodelogger.info("product_id: "+ product_id);
     try{
-        d
         const stockObj = await stockModel.findAll({
             where: {
                 product_id: product_id,
@@ -697,43 +724,53 @@ async function handalFindProductById(req, res){
             quantity: "",
             quantity_id: "",
             quantity_buy_price: "",
+            quantity_mrp_price: "",
             quantity_selling_price: "",
             quantityXs: "",
             quantity_Xs_id: "",
             quantityXs_buy_price: "",
+            quantityXs_mrp_price: "",
             quantityXs_selling_price: "",
             quantityS: "",
             quantity_S_id: "",
             quantityS_buy_price: "",
+            quantityS_mrp_price: "",
             quantityS_selling_price: "",
             quantityL: "",
             quantity_L_id: "",
             quantityL_buy_price: "",
+            quantityL_mrp_price: "",
             quantityL_selling_price: "",
             quantityM: "",
             quantity_M_id: "",
             quantityM_buy_price: "",
+            quantityM_mrp_price: "",
             quantityM_selling_price: "",
             quantityXl: "",
             quantity_Xl_id: "",
             quantityXl_buy_price: "",
+            quantityXl_mrp_price: "",
             quantityXl_selling_price: "",
             quantity2Xl: "",
             quantity_2Xl_id: "",
             quantity2Xl_buy_price: "",
+            quantity2Xl_mrp_price: "",
             quantity2Xl_selling_price: "",
             
             quantity32: "",
             quantity_32_id: "",
             quantity32_buy_price: "",
+            quantity32_mrp_price: "",
             quantity32_selling_price: "",
             quantity34: "",
             quantity_34_id: "",
             quantity34_buy_price: "",
+            quantity34_mrp_price: "",
             quantity34_selling_price: "",
             quantity36: "",
             quantity_36_id: "",
             quantity36_buy_price: "",
+            quantity36_mrp_price: "",
             quantity36_selling_price: "",
 
             product_febric_id: "",
@@ -822,51 +859,61 @@ async function handalFindProductById(req, res){
                             productHash['quantityXs'] = quantity.no_of_product;
                             productHash['quantity_Xs_id'] = quantity.id;
                             productHash['quantityXs_buy_price'] = quantity.buy_price;
+                            productHash['quantityXs_mrp_price'] = quantity.mrp_price;
                             productHash['quantityXs_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "S"){
                             productHash['quantityS'] = quantity.no_of_product;
                             productHash['quantity_S_id'] = quantity.id;
                             productHash['quantityS_buy_price'] = quantity.buy_price;
+                            productHash['quantityS_mrp_price'] = quantity.mrp_price;
                             productHash['quantityS_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "L"){
                             productHash['quantityL'] = quantity.no_of_product;
                             productHash['quantity_L_id'] = quantity.id;
                             productHash['quantityL_buy_price'] = quantity.buy_price;
+                            productHash['quantityL_mrp_price'] = quantity.mrp_price;
                             productHash['quantityL_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "M"){
                             productHash['quantityM'] = quantity.no_of_product;
                             productHash['quantity_M_id'] = quantity.id;
                             productHash['quantityM_buy_price'] = quantity.buy_price;
+                            productHash['quantityM_mrp_price'] = quantity.mrp_price;
                             productHash['quantityM_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "XL"){
                             productHash['quantityXl'] = quantity.no_of_product;
                             productHash['quantity_Xl_id'] = quantity.id;
                             productHash['quantityXl_buy_price'] = quantity.buy_price;
+                            productHash['quantityXl_mrp_price'] = quantity.mrp_price;
                             productHash['quantityXl_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "2XL"){
                             productHash['quantity2Xl'] = quantity.no_of_product;
                             productHash['quantity_2Xl_id'] = quantity.id;
                             productHash['quantity2Xl_buy_price'] = quantity.buy_price;
+                            productHash['quantity2Xl_mrp_price'] = quantity.mrp_price;
                             productHash['quantity2Xl_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "32"){
                             productHash['quantity32'] = quantity.no_of_product;
                             productHash['quantity_32'] = quantity.id;
                             productHash['quantity32_buy_price'] = quantity.buy_price;
+                            productHash['quantity32_mrp_price'] = quantity.mrp_price;
                             productHash['quantity32_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "34"){
                             productHash['quantity34'] = quantity.no_of_product;
                             productHash['quantity_34'] = quantity.id;
                             productHash['quantity34_buy_price'] = quantity.buy_price;
+                            productHash['quantity34_mrp_price'] = quantity.mrp_price;
                             productHash['quantity34_selling_price'] = quantity.sell_price;
                         }else if(quantity.size == "36"){
                             productHash['quantity36'] = quantity.no_of_product;
                             productHash['quantity_36'] = quantity.id;
                             productHash['quantity36_buy_price'] = quantity.buy_price;
+                            productHash['quantity36_mrp_price'] = quantity.mrp_price;
                             productHash['quantity36_selling_price'] = quantity.sell_price;
                         }else{
                             productHash['quantity'] = quantity.no_of_product;
                             productHash['quantity_id'] = quantity.id;
                             productHash['quantity_buy_price'] = quantity.buy_price;
+                            productHash['quantity_mrp_price'] = quantity.mrp_price;
                             productHash['quantity_selling_price'] = quantity.sell_price;
                         }
                     });
@@ -1687,11 +1734,14 @@ async function getSareeListForHomePage(req, res){
                             inner_hash['quantity'] = quantity.no_of_product
                             inner_hash['price'] = quantity.sell_price
                             
-                            let offerPrice = 0;
+                            //let offerPrice = 0;
+                            let offerPrice = quantity.mrp_price;
                             if(product.product_offer_percentage > 0){
-                                offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                                //offerPrice = quantity.sell_price * product.product_offer_percentage/100
+                                offerPrice = quantity.mrp_price;
                             }
-                            inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+                            inner_hash['offerPrice'] = offerPrice;
+                            // inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
 
                             let newPercentage = 0;
                             if (product.product_offer_percentage > 0){
@@ -1766,6 +1816,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantity,
                     size: "",
                     buy_price: req.body.quantity_buy_price,
+                    mrp_price: req.body.quantity_mrp_price,
                     sell_price: req.body.quantity_selling_price
                 }
             )
@@ -1778,6 +1829,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantityXs,
                     size: "XS",
                     buy_price: req.body.quantityXs_buy_price,
+                    mrp_price: req.body.quantityXs_mrp_price,
                     sell_price: req.body.quantityXs_selling_price
                 }
             )
@@ -1790,6 +1842,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantityS,
                     size: "S",
                     buy_price: req.body.quantityS_buy_price,
+                    mrp_price: req.body.quantityS_mrp_price,
                     sell_price: req.body.quantityS_selling_price
                 }
             )
@@ -1802,6 +1855,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantityL,
                     size: "L",
                     buy_price: req.body.quantityL_buy_price,
+                    mrp_price: req.body.quantityL_mrp_price,
                     sell_price: req.body.quantityL_selling_price
                 }
             )
@@ -1814,6 +1868,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantityM,
                     size: "M",
                     buy_price: req.body.quantityM_buy_price,
+                    mrp_price: req.body.quantityM_mrp_price,
                     sell_price: req.body.quantityM_selling_price
                 }
             )
@@ -1826,6 +1881,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantityXl,
                     size: "XL",
                     buy_price: req.body.quantityXl_buy_price,
+                    mrp_price: req.body.quantityXl_mrp_price,
                     sell_price: req.body.quantityXl_selling_price
                 }
             )
@@ -1839,6 +1895,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantity2Xl,
                     size: "2XL",
                     buy_price: req.body.quantity2Xl_buy_price,
+                    mrp_price: req.body.quantity2Xl_mrp_price,
                     sell_price: req.body.quantity2Xl_selling_price
                 }
             )
@@ -1852,6 +1909,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantity32,
                     size: "32",
                     buy_price: req.body.quantity32_buy_price,
+                    mrp_price: req.body.quantity32_mrp_price,
                     sell_price: req.body.quantity32_selling_price
                 }
             )
@@ -1865,6 +1923,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantity34,
                     size: "34",
                     buy_price: req.body.quantity34_buy_price,
+                    mrp_price: req.body.quantity34_mrp_price,
                     sell_price: req.body.quantity34_selling_price
                 }
             )
@@ -1878,6 +1937,7 @@ async function saveProductStock(req, res){
                     no_of_product: req.body.quantity36,
                     size: "36",
                     buy_price: req.body.quantity36_buy_price,
+                    mrp_price: req.body.quantity36_mrp_price,
                     sell_price: req.body.quantity36_selling_price
                 }
             )
@@ -1927,6 +1987,7 @@ async function updateQuantity(req, res) {
             no_of_product: stockObj.no_of_product,
             size: stockObj.size,
             buy_price: stockObj.buy_price,
+            mrp_price: stockObj.mrp_price,
             sell_price: stockObj.sell_price
         }
 
