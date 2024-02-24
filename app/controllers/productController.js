@@ -1395,13 +1395,13 @@ async function getItemsList(req, res){
                         
                         let offerPrice = 0;
                         let newPercentage = 0;
-                        if(product.product_offer_percentage > 0){
+                        /*if(product.product_offer_percentage > 0){
                             offerPrice = quantity.sell_price * product.product_offer_percentage/100;
 
                             newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
-                        }
-                        inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
-                        inner_hash['newPercentage'] = newPercentage;
+                        }*/
+                        inner_hash['offerPrice'] = quantity.mrp_price;
+                        inner_hash['newPercentage'] = Math.floor(((quantity.mrp_price - quantity.sell_price) / quantity.mrp_price) * 100);
                     })
                 }
 
@@ -1508,16 +1508,16 @@ async function getItemsDetails(req, res){
             let productSize = [];
             productObj.Quantity.forEach((quantityObj) => {
                 let offerPrice = 0;
-                let newPercentage = 0;
-                if (productObj.product_offer_percentage > 0){
+                let newPercentage = Math.floor(((quantityObj.mrp_price - quantityObj.sell_price) / quantityObj.mrp_price) * 100);
+                /*if (productObj.product_offer_percentage > 0){
                     offerPrice = quantityObj.sell_price * productObj.product_offer_percentage/100;
                     newPercentage = Math.floor((((quantityObj.sell_price + offerPrice) - quantityObj.sell_price)/(quantityObj.sell_price + offerPrice))*100);
-                }
+                }*/
                 const quantityHash = {
                     no_of_product: quantityObj.no_of_product,
                     size: quantityObj.size,
                     sell_price: quantityObj.sell_price,
-                    offerPrice: quantityObj.sell_price + offerPrice,
+                    offerPrice: quantityObj.mrp_price,
                     newPercentage: newPercentage
                 }
                 productSize.push(quantityObj.size);
@@ -1612,13 +1612,13 @@ async function getSimilarProducts(req, res){
                         inner_hash['price'] = quantity.sell_price
                         
                         let offerPrice = 0;
-                        let newPercentage = 0;
-                        if(product.product_offer_percentage > 0){
+                        let newPercentage = Math.floor(((quantity.mrp_price - quantity.sell_price) / quantity.mrp_price) * 100);
+                        /*if(product.product_offer_percentage > 0){
                             offerPrice = quantity.sell_price * product.product_offer_percentage/100;
 
                             newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
-                        }
-                        inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
+                        }*/
+                        inner_hash['offerPrice'] = quantity.mrp_price;
                         inner_hash['newPercentage'] = newPercentage;
                     })
                 }
