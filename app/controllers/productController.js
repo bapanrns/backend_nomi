@@ -1710,8 +1710,7 @@ async function getSareeListForHomePage(req, res){
                     }
                     let inner_hash = {
                         item_id: product.id,
-                       // product_offer_percentage: product.product_offer_percentage,
-                        product_offer_percentage: 0,
+                        product_offer_percentage: product.product_offer_percentage,
                         product_name: product.product_name,
                         company_name: product.company_name,
                         more_color: productCountHash[product.SubCategory.id] -1
@@ -1737,18 +1736,18 @@ async function getSareeListForHomePage(req, res){
                             
                             //let offerPrice = 0;
                             let offerPrice = quantity.mrp_price;
-                            //if(product.product_offer_percentage > 0){
+                            if(product.product_offer_percentage > 0){
                                 //offerPrice = quantity.sell_price * product.product_offer_percentage/100
                                 offerPrice = quantity.mrp_price;
-                            //}
+                            }
                             inner_hash['offerPrice'] = offerPrice;
                             // inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
 
                             let newPercentage = 0;
-                            //if (product.product_offer_percentage > 0){
-                            offerPrice = quantity.sell_price * product.product_offer_percentage/100;
-                            newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
-                            //}
+                            if (product.product_offer_percentage > 0){
+                                offerPrice = quantity.sell_price * product.product_offer_percentage/100;
+                                newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
+                            }
                             inner_hash['product_offer_percentage'] = newPercentage;
                         })
                     }
