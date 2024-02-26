@@ -1637,7 +1637,7 @@ async function getSimilarProducts(req, res){
 async function getSareeListForHomePage(req, res){
     Nodelogger.info("getSareeListForHomePage: "+path.basename(__filename));
     Nodelogger.info(req.body);
-    //try {
+    try {
         let itemsListArray = [];
         let itemListHash = {};
 
@@ -1763,11 +1763,11 @@ async function getSareeListForHomePage(req, res){
         }
     
         return res.status(200).send(itemListHash);
-   /* } catch (error) {
+    } catch (error) {
         Nodelogger.error("getSareeListForHomePage: "+path.basename(__filename));
         Nodelogger.error(error);
         return res.status(500).send([]);
-    }*/
+    }
 }
 
 async function allProductStock(req, res){
