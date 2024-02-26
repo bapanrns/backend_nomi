@@ -1718,7 +1718,6 @@ async function getSareeListForHomePage(req, res){
                     }
                     
                     if(product.Product_Image !=undefined){
-                        //console.log("product.Product_Image", product.Product_Image);
                         product.Product_Image.forEach((Product_Image, key) => {
                             if(key == 0 || Product_Image.primary == 1){
                                 inner_hash['image_name'] = Product_Image.image_name
@@ -1735,20 +1734,9 @@ async function getSareeListForHomePage(req, res){
                             inner_hash['quantity'] = quantity.no_of_product
                             inner_hash['price'] = quantity.sell_price
                             
-                            //let offerPrice = 0;
-                            let offerPrice = quantity.mrp_price;
-                            //if(product.product_offer_percentage > 0){
-                                //offerPrice = quantity.sell_price * product.product_offer_percentage/100
-                                offerPrice = quantity.mrp_price;
-                            //}
-                            inner_hash['offerPrice'] = offerPrice;
-                            // inner_hash['offerPrice'] = quantity.sell_price + offerPrice;
-
+                            inner_hash['offerPrice'] = quantity.mrp_price;
                             let newPercentage = 0;
-                            //if (product.product_offer_percentage > 0){
-                            offerPrice = quantity.sell_price * product.product_offer_percentage/100;
-                            newPercentage = Math.floor((((quantity.sell_price + offerPrice) - quantity.sell_price)/(quantity.sell_price + offerPrice))*100);
-                            //}
+                            newPercentage = Math.floor(((quantity.mrp_price - quantity.sell_price) / quantity.mrp_price) * 100);
                             inner_hash['product_offer_percentage'] = newPercentage;
                         })
                     }
